@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lockerz/views/edit_account_page.dart';
+import '../admin/administration_page.dart';
 
 class NavBar extends StatelessWidget implements PreferredSizeWidget {
   const NavBar({
@@ -12,7 +14,10 @@ class NavBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         TextButton(
           onPressed: () => {
-            debugPrint("Administration")
+            debugPrint("Administration"),
+            Navigator.push(
+              context, MaterialPageRoute(builder: (context) => AdministrationPage()),
+            )
           },
           child: const Text(
             'Administration',
@@ -21,7 +26,10 @@ class NavBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         TextButton(
           onPressed: () => {
-            debugPrint("Mon Compte")
+            debugPrint("Mon Compte"),
+            Navigator.push(
+              context, MaterialPageRoute(builder: (context) => const EditAccountPage()),
+            )
           },
           child: const Text(
             'Mon Compte',

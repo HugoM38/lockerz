@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
 
 class LoginController {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
 
-  void login(BuildContext context) {
+  void login(BuildContext context) async {
     final email = emailController.text;
     final password = passwordController.text;
 
-    if (email == "test@test.com" && password == "password") {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Connexion réussie')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Échec de la connexion')),
-      );
-    }
+    final success = await _authService.login(email, password);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(success ? 'Connexion réussie' : 'Échec de la connexion')),
+    );
   }
 
   void dispose() {

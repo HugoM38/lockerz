@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import '../utils/shared_prefs.dart';
 
@@ -16,7 +17,15 @@ class AuthService {
       final responseData = jsonDecode(response.body);
       final token = responseData['token'];
 
+      final user = responseData['user'];
+      final firstName = user['firstname'];
+      final lastName = user['lastname'];
+
+
+      debugPrint("TEST $firstName");
+      debugPrint(lastName);
       await SharedPrefs.saveAuthToken(token);
+      await SharedPrefs.saveUserInformation(firstName, lastName);
 
       return true;
     } else {

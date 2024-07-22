@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lockerz/views/shared/navbar.dart';
+import 'package:lockerz/utils/shared_prefs.dart';
+import '../controllers/edit_account_controller.dart';
 
 class EditAccountPage extends StatefulWidget {
   const EditAccountPage({super.key});
@@ -11,14 +13,33 @@ class EditAccountPage extends StatefulWidget {
 class _EditAccountPageState extends State<EditAccountPage> {
   final _formKeyName = GlobalKey<FormState>();
   final _formKeyPassword = GlobalKey<FormState>();
-  String _firstName = '';
-  String _lastName = '';
-  String _oldPassword = '';
-  String _newPassword = '';
-  String _confirmNewPassword = '';
+  final EditAccountController _editAccountController = EditAccountController();
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeControllers();
+  }
+
+  Future<void> _initializeControllers() async {
+    final firstName = await SharedPrefs.getFirstName();
+    final lastName = await SharedPrefs.getLastName();
+    setState(() {
+      _editAccountController.firstNameController.text = firstName as String;
+      _editAccountController.lastNameController.text = lastName as String;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: const NavBar(),
       body: Padding(
@@ -33,45 +54,29 @@ class _EditAccountPageState extends State<EditAccountPage> {
                   const Text('Modifier le nom', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   TextFormField(
+                    controller: _editAccountController.firstNameController,
                     decoration: const InputDecoration(labelText: 'Prénom'),
-                    initialValue: _firstName,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Veuillez entrer votre prénom';
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      setState(() {
-                        _firstName = value!;
-                      });
-                    },
                   ),
                   TextFormField(
+                    controller: _editAccountController.lastNameController,
                     decoration: const InputDecoration(labelText: 'Nom'),
-                    initialValue: _lastName,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Veuillez entrer votre nom';
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      setState(() {
-                        _lastName = value!;
-                      });
-                    },
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      if (_formKeyName.currentState!.validate()) {
-                        _formKeyName.currentState!.save();
-                        // Logique pour sauvegarder les modifications du nom
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Nom et prénom mis à jour')),
-                        );
-                      }
+                      _editAccountController.userInformation(context);
                     },
                     child: const Text('Enregistrer les modifications de nom'),
                   ),
@@ -96,11 +101,6 @@ class _EditAccountPageState extends State<EditAccountPage> {
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      setState(() {
-                        _oldPassword = value!;
-                      });
-                    },
                   ),
                   TextFormField(
                     decoration: const InputDecoration(labelText: 'Nouveau mot de passe'),
@@ -111,11 +111,6 @@ class _EditAccountPageState extends State<EditAccountPage> {
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      setState(() {
-                        _newPassword = value!;
-                      });
-                    },
                   ),
                   TextFormField(
                     decoration: const InputDecoration(labelText: 'Confirmer le nouveau mot de passe'),
@@ -123,7 +118,7 @@ class _EditAccountPageState extends State<EditAccountPage> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Veuillez confirmer votre nouveau mot de passe';
-                      } else if (value != _newPassword) {
+                      } else if (value != "_newPassword") {
                         return 'Les mots de passe ne correspondent pas';
                       }
                       return null;

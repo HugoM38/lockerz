@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import '../utils/shared_prefs.dart';
@@ -8,7 +9,7 @@ class UserService {
 
   Future<bool> editUserInformations(String firstname, String lastname) async {
     Uri url = Uri.parse("$baseUrl/edit");
-    //try {
+    try {
       final response = await http.patch(
         url,
         headers: <String, String>{
@@ -25,15 +26,15 @@ class UserService {
         throw Exception(response.body);
       }
       return true;
-      /**
     } catch (e) {
       throw Exception(e.toString());
-    }*/
+    }
   }
 
   Future<bool> editUserPassword(String oldPassword, String newPassword) async {
-    Uri url = Uri.parse("${baseUrl}editPassword");
+    Uri url = Uri.parse("$baseUrl/editPassword");
     try {
+      debugPrint(await SharedPrefs.getAuthToken());
       var response = await http.patch(
         url,
         headers: <String, String>{
@@ -46,7 +47,7 @@ class UserService {
         }),
       );
 
-      if (response.statusCode != 200) {
+      if (response.statusCode != 201) {
         throw Exception(response.body);
       }
       return true;

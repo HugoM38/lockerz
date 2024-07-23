@@ -93,6 +93,7 @@ class _EditAccountPageState extends State<EditAccountPage> {
                   const Text('Modifier le mot de passe', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   TextFormField(
+                    controller: _editAccountController.oldPasswordController,
                     decoration: const InputDecoration(labelText: 'Ancien mot de passe'),
                     obscureText: true,
                     validator: (value) {
@@ -103,6 +104,7 @@ class _EditAccountPageState extends State<EditAccountPage> {
                     },
                   ),
                   TextFormField(
+                    controller: _editAccountController.newPasswordController,
                     decoration: const InputDecoration(labelText: 'Nouveau mot de passe'),
                     obscureText: true,
                     validator: (value) {
@@ -113,12 +115,13 @@ class _EditAccountPageState extends State<EditAccountPage> {
                     },
                   ),
                   TextFormField(
+                    controller: _editAccountController.samePasswordController,
                     decoration: const InputDecoration(labelText: 'Confirmer le nouveau mot de passe'),
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Veuillez confirmer votre nouveau mot de passe';
-                      } else if (value != "_newPassword") {
+                      } else if (value != _editAccountController.newPasswordController.text) {
                         return 'Les mots de passe ne correspondent pas';
                       }
                       return null;
@@ -128,11 +131,7 @@ class _EditAccountPageState extends State<EditAccountPage> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKeyPassword.currentState!.validate()) {
-                        _formKeyPassword.currentState!.save();
-                        // Logique pour sauvegarder les modifications du mot de passe
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Mot de passe mis à jour')),
-                        );
+                        _editAccountController.userPassword(context);
                       }
                     },
                     child: const Text('Enregistrer les modifications de mot de passe'),

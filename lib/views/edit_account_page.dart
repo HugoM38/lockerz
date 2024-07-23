@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lockerz/views/login_view.dart';
 import 'package:lockerz/views/shared/navbar.dart';
 import 'package:lockerz/utils/shared_prefs.dart';
 import '../controllers/edit_account_controller.dart';
@@ -164,7 +165,9 @@ class _EditAccountPageState extends State<EditAccountPage> {
                         TextButton(
                           onPressed: () async {
                             if(await _editAccountController.deleteAccount(context)){
-                              Navigator.of(context).pop();
+                              SharedPrefs.removeAuthToken();
+                              SharedPrefs.removeUserInformation();
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginView()));
                             }
                           },
                           child: const Text('Supprimer'),

@@ -13,6 +13,7 @@ class EditAccountPage extends StatefulWidget {
 class _EditAccountPageState extends State<EditAccountPage> {
   final _formKeyName = GlobalKey<FormState>();
   final _formKeyPassword = GlobalKey<FormState>();
+  final _passwordRegExp = RegExp(r'^(?=.*[A-Z])(?=.*\d).{8,}$');
   final EditAccountController _editAccountController = EditAccountController();
   bool _isLoading = true;
 
@@ -76,9 +77,11 @@ class _EditAccountPageState extends State<EditAccountPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      _editAccountController.userInformation(context);
+                      if (_formKeyName.currentState!.validate()) {
+                        _editAccountController.userInformation(context);
+                      }
                     },
-                    child: const Text('Enregistrer les modifications de nom'),
+                    child: const Text('Sauvegarder les modifications'),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -110,6 +113,8 @@ class _EditAccountPageState extends State<EditAccountPage> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Veuillez entrer un nouveau mot de passe';
+                      } else if(!_passwordRegExp.hasMatch(value)){
+                        return 'Le mot de passe doit faire 8 caractère et doit contenir au moins une majuscule';
                       }
                       return null;
                     },
@@ -134,7 +139,7 @@ class _EditAccountPageState extends State<EditAccountPage> {
                         _editAccountController.userPassword(context);
                       }
                     },
-                    child: const Text('Enregistrer les modifications de mot de passe'),
+                    child: const Text('Enregistrer le nouveau mot de passe'),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -157,14 +162,10 @@ class _EditAccountPageState extends State<EditAccountPage> {
                           child: const Text('Annuler'),
                         ),
                         TextButton(
-                          onPressed: () {
-                            // Logique pour confirmer la suppression du compte
-                            Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Compte supprimé')),
-                            );
-                            // Redirection après suppression
-                            Navigator.of(context).pop();
+                          onPressed: () async {
+                            if(await _editAccountController.deleteAccount(context)){
+                              Navigator.of(context).pop();
+                            }
                           },
                           child: const Text('Supprimer'),
                         ),

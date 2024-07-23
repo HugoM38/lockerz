@@ -23,7 +23,8 @@ class UserService {
       );
 
       if (response.statusCode != 201) {
-        throw Exception(response.body);
+        debugPrint(response.body);
+        return false;
       }
       return true;
     } catch (e) {
@@ -48,7 +49,8 @@ class UserService {
       );
 
       if (response.statusCode != 201) {
-        throw Exception(response.body);
+        debugPrint(response.body);
+        return false;
       }
       return true;
     } catch (e) {
@@ -57,7 +59,7 @@ class UserService {
   }
 
   Future<bool> deleteUser() async {
-    Uri url = Uri.parse("${baseUrl}delete/");
+    Uri url = Uri.parse("$baseUrl/delete");
     try {
       var response = await http.delete(
         url,
@@ -66,8 +68,10 @@ class UserService {
           'Authorization': 'Bearer ${ await SharedPrefs.getAuthToken()}'
         },
       );
-      if (response.statusCode != 200) {
-        throw Exception(response.body);
+      debugPrint(response.body);
+      if (response.statusCode != 204) {
+        debugPrint(response.body);
+        return false;
       }
       return true;
     } catch (e) {

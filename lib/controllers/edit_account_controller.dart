@@ -15,7 +15,6 @@ class EditAccountController {
   void userInformation(BuildContext context) async {
     final firstName = firstNameController.text;
     final lastName = lastNameController.text;
-
     final success = await _userService.editUserInformations(firstName, lastName);
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -29,16 +28,17 @@ class EditAccountController {
   void userPassword(BuildContext context) async {
     final oldPassword = oldPasswordController.text;
     final newPassword = newPasswordController.text;
-    final RegExp _passwordRegExp = RegExp(r'^(?=.*[A-Z])(?=.*\d).{8,}$');
-    if (!_passwordRegExp.hasMatch(newPassword)){
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Nouveau mot de passe invalide")),
-      );
-    } else {
-      final success = await _userService.editUserPassword(oldPassword, newPassword);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(success ? 'Modification réussie' : 'Échec de la modification')),
-      );
-    }
+    final success = await _userService.editUserPassword(oldPassword, newPassword);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(success ? 'Modification réussie' : 'Échec de la modification')),
+    );
+  }
+
+  Future<bool> deleteAccount(BuildContext context) async {
+    final success = await _userService.deleteUser();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(success ? 'Suppression réussie' : 'Échec de la suppression')),
+    );
+    return success;
   }
 }

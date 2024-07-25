@@ -1,33 +1,35 @@
-import 'dart:ffi';
-
 class Reservation {
-  List<String> memberList;
+  String id;
+  String locker;
   String owner;
-  String lockerId;
-  Int lockerNumber;
+  List<String> members;
+  String status;
 
   Reservation({
-    required this.memberList,
+    required this.id,
+    required this.members,
     required this.owner,
-    required this.lockerId,
-    required this.lockerNumber,
+    required this.locker,
+    required this.status,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'memberList': memberList,
+      '_id': id,
+      'members': members,
       'owner': owner,
-      'lockerId': lockerId,
-      'lockerNumber': lockerNumber,
+      'locker': locker,
+      'status': status,
     };
   }
 
   factory Reservation.fromJson(Map<String, dynamic> json) {
     return Reservation(
-      memberList: json['memberList'],
+      id: json['_id'],
+      members: List<String>.from(json['members']),
       owner: json['owner'],
-      lockerId: json['lockerId'],
-      lockerNumber: json['lockerNumber'],
+      locker: json['locker'],
+      status: json['status'],
     );
   }
 }

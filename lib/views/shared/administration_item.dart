@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:lockerz/models/reservation_model.dart';
+import 'package:lockerz/services/reservation_service.dart';
+import '../../controllers/administration_controller.dart';
 
 class AdministrationItem extends StatefulWidget {
-  final String title;
-  final String details;
+  final Reservation reservation;
+  final VoidCallback onRemove;
 
   const AdministrationItem({
     super.key,
-    required this.title,
-    required this.details,
+    required this.reservation,
+    required this.onRemove,
   });
 
   @override
@@ -15,7 +18,54 @@ class AdministrationItem extends StatefulWidget {
 }
 
 class _AdministrationItemState extends State<AdministrationItem> {
+  final AdministrationController _administrationController = AdministrationController();
+
+  @override
+  void initState() {
+    super.initState();
+    _administrationController.reservation = widget.reservation;
+  }
+
   bool _isExpanded = false;
+
+  Future<void> _showConfirmationDialog(String action) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmation'),
+          content: Text('Êtes-vous sûr de vouloir $action cette réservation ?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Annuler'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Confirmer'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (action == 'valider') {
+                  _administrationController.validate().then((success) {
+                    if (success) {
+                      widget.onRemove();
+                    }
+                  });
+                } else {
+                  _administrationController.refuse().then((success) {
+                    if (success) {
+                      widget.onRemove();
+                    }
+                  });
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,20 +86,18 @@ class _AdministrationItemState extends State<AdministrationItem> {
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(widget.title),
+                      Text("${_administrationController.reservation.owner}:${_administrationController.reservation.locker}"),
                       Row(
                         children: [
                           TextButton(
                             onPressed: () {
-                              // API Accept Request
-                              debugPrint("Valider Reservation");
+                              _showConfirmationDialog('valider');
                             },
                             child: const Text('Valider', style: TextStyle(color: Colors.green)),
                           ),
                           TextButton(
                             onPressed: () {
-                              // API Refuse Request
-                              debugPrint("Refuser Reservation");
+                              _showConfirmationDialog('refuser');
                             },
                             child: const Text('Refuser', style: TextStyle(color: Colors.red)),
                           ),
@@ -60,7 +108,7 @@ class _AdministrationItemState extends State<AdministrationItem> {
                 );
               },
               body: ListTile(
-                title: Text(widget.details),
+                title: Text(_administrationController.reservation.members.toString()),
               ),
               isExpanded: _isExpanded,
             ),

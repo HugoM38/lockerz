@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lockerz/views/edit_account_page.dart';
+import 'package:lockerz/views/user/home_page.dart';
 import 'views/login_view.dart';
 import 'views/signup_view.dart';
 
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginView(),
         '/signup': (context) => SignupView(),
         '/account': (context)=> EditAccountPage(),
+        '/home': (context)=> HomePage(),
       },
     );
   }

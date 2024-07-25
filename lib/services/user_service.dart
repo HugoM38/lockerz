@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/user_model.dart';
 import '../utils/shared_prefs.dart';
 
 class UserService {
@@ -74,6 +75,48 @@ class UserService {
         return false;
       }
       return true;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<List<User>> getUsers() async{
+    Uri url = Uri.parse("$baseUrl/");
+    try {
+      var response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${ await SharedPrefs.getAuthToken()}'
+        },
+      );
+      if (response.statusCode != 200) {
+        debugPrint(response.body);
+      }
+      List<dynamic> body = jsonDecode(response.body);
+      List<User> users = body.map((dynamic item) => User.fromJson(item)).toList();
+      return users;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<User> getUser(String id) async{
+    Uri url = Uri.parse("$baseUrl/$id");
+    try {
+      var response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${ await SharedPrefs.getAuthToken()}'
+        },
+      );
+      if (response.statusCode != 200) {
+        debugPrint(response.body);
+      }
+      dynamic body = jsonDecode(response.body);
+      User user = User.fromJson(body);
+      return user;
     } catch (e) {
       throw Exception(e.toString());
     }

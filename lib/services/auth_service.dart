@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import '../utils/shared_prefs.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://localhost:5001/api/auth'; // Remplacez par l'URL de votre API
+  static const String baseUrl =
+      'http://localhost:5001/api/auth';
 
-  Future<bool> login(String email, String password) async {
+  Future<http.Response> login(String email, String password) async {
     final response = await http.post(
       Uri.parse('$baseUrl/signin'),
       headers: {'Content-Type': 'application/json'},
@@ -18,39 +18,35 @@ class AuthService {
       final token = responseData['token'];
 
       final user = responseData['user'];
-      final firstName = user['firstname'];
-      final lastName = user['lastname'];
 
-
-      debugPrint("TEST $firstName");
-      debugPrint(lastName);
       await SharedPrefs.saveAuthToken(token);
-      await SharedPrefs.saveUserInformation(firstName, lastName);
-
-      return true;
-    } else {
-      return false;
+      await SharedPrefs.saveUserInformation(jsonEncode(user));
     }
+    return response;
   }
 
-  Future<bool> register(String firstname, String lastname, String email, String password) async {
+  Future<http.Response> register(
+      String firstname, String lastname, String email, String password) async {
     final response = await http.post(
       Uri.parse('$baseUrl/signup'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'firstname': firstname, 'lastname': lastname, 'email': email, 'password': password}),
+      body: jsonEncode({
+        'firstname': firstname,
+        'lastname': lastname,
+        'email': email,
+        'password': password
+      }),
     );
 
     if (response.statusCode == 201) {
       final responseData = jsonDecode(response.body);
       final token = responseData['token'];
 
-      // Store token in SharedPreferences
       await SharedPrefs.saveAuthToken(token);
-
-      return true;
-    } else {
-      return false;
+      await SharedPrefs.saveUserInformation(jsonEncode(responseData['user']));
     }
+
+    return response;
   }
 
   Future<void> logout() async {

@@ -25,11 +25,12 @@ class EditAccountPageState extends State<EditAccountPage> {
   }
 
   Future<void> _initializeControllers() async {
-    final firstName = await SharedPrefs.getFirstName();
-    final lastName = await SharedPrefs.getLastName();
+    final user = await SharedPrefs.getUser();
+    final firstName = user.firstname;
+    final lastName = user.lastname;
     setState(() {
-      _editAccountController.firstNameController.text = firstName as String;
-      _editAccountController.lastNameController.text = lastName as String;
+      _editAccountController.firstNameController.text = firstName;
+      _editAccountController.lastNameController.text = lastName;
       _isLoading = false;
     });
   }

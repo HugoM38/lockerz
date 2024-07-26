@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 
@@ -10,14 +12,60 @@ class LoginController {
     final email = emailController.text;
     final password = passwordController.text;
 
-    final success = await _authService.login(email, password);
-
-    if (context.mounted) {
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content:
-                Text(success ? 'Connexion réussie' : 'Échec de la connexion')),
+        const SnackBar(content: Text('Veuillez remplir tous les champs')),
       );
+      return;
+    }
+
+    if (!email.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez saisir un email valide')),
+      );
+      return;
+    }
+
+    if (RegExp(r'^(?=.*[A-Z])(?=.*\d).{8,}$').hasMatch(password) == false) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre')),
+      );
+      return;
+    }
+
+    if (!email.endsWith("@myges.fr")) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Veuillez saisir un email de l\'école finissant par "myges.fr"')),
+      );
+      return;
+    }
+
+    try {
+      final response = await _authService.login(email, password);
+
+      if (context.mounted) {
+        if (response.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Connexion réussie')),
+          );
+          Navigator.of(context).pushReplacementNamed('/home');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(jsonDecode(response.body)["error"])),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Une erreur est survenue lors de la connexion')),
+        );
+      }
     }
   }
 

@@ -17,8 +17,23 @@ class Lockerz extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Auth Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        colorScheme: const ColorScheme(
+          primary: Color(0xFF406E8E),
+          primaryContainer: Color(0xFF406E8E),
+          secondary: Color(0xFF42113C),
+          secondaryContainer: Color(0xFF42113C),
+          surface: Color(0xFF1C0118),
+          error: Colors.red,
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+          onSurface: Colors.white,
+          onError: Colors.white,
+          brightness: Brightness.dark,
+        ),
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(color: Colors.white),
+          bodyLarge: TextStyle(color: Colors.white),
+        ),
       ),
       initialRoute: '/login',
       routes: {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:lockerz/utils/shared_prefs.dart';
 import '../services/user_service.dart';
@@ -26,7 +28,11 @@ class EditAccountController {
       );
     }
     if (success) {
-      await SharedPrefs.saveUserInformation(firstName, lastName);
+      await SharedPrefs.getUser().then((user) {
+        user.firstname = firstName;
+        user.lastname = lastName;
+        SharedPrefs.saveUserInformation(jsonEncode(user.toJson()));
+      });
     }
   }
 

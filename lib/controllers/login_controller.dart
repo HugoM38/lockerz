@@ -12,9 +12,13 @@ class LoginController {
 
     final success = await _authService.login(email, password);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(success ? 'Connexion réussie' : 'Échec de la connexion')),
-    );
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content:
+                Text(success ? 'Connexion réussie' : 'Échec de la connexion')),
+      );
+    }
   }
 
   void dispose() {

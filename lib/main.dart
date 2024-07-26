@@ -6,10 +6,12 @@ import 'views/login_view.dart';
 import 'views/signup_view.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const Lockerz());
 }
 
-class MyApp extends StatelessWidget {
+class Lockerz extends StatelessWidget {
+  const Lockerz({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,11 +22,11 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/login',
       routes: {
-        '/login': (context) => LoginView(),
-        '/signup': (context) => SignupView(),
-        '/account': (context)=> EditAccountPage(),
-        '/home': (context)=> HomePage(),
-        '/admin': (context)=> AdministrationPage(),
+        '/login': (context) => const LoginView(),
+        '/signup': (context) => const SignupView(),
+        '/account': (context) => const EditAccountPage(),
+        '/home': (context) => const HomePage(),
+        '/admin': (context) => const AdministrationPage(),
       },
     );
   }

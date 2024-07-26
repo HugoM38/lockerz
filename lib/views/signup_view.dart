@@ -67,9 +67,9 @@ class _SignupViewState extends State<SignupView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Spacer(),
-                    Center(child: TextUtil(text: "Sign Up", weight: true, size: 30)),
+                    const Center(child: TextUtil(text: "Sign Up", weight: true, size: 30)),
                     const Spacer(),
-                    TextUtil(text: "First Name"),
+                    const TextUtil(text: "First Name"),
                     Container(
                       height: 35,
                       decoration: const BoxDecoration(
@@ -86,7 +86,7 @@ class _SignupViewState extends State<SignupView> {
                       ),
                     ),
                     const Spacer(),
-                    TextUtil(text: "Last Name"),
+                    const TextUtil(text: "Last Name"),
                     Container(
                       height: 35,
                       decoration: const BoxDecoration(
@@ -103,7 +103,7 @@ class _SignupViewState extends State<SignupView> {
                       ),
                     ),
                     const Spacer(),
-                    TextUtil(text: "Email"),
+                    const TextUtil(text: "Email"),
                     Container(
                       height: 35,
                       decoration: const BoxDecoration(
@@ -120,7 +120,7 @@ class _SignupViewState extends State<SignupView> {
                       ),
                     ),
                     const Spacer(),
-                    TextUtil(text: "Password"),
+                    const TextUtil(text: "Password"),
                     Container(
                       height: 35,
                       decoration: const BoxDecoration(
@@ -157,7 +157,7 @@ class _SignupViewState extends State<SignupView> {
                         onPressed: () {
                           _signupController.signUp(context);
                         },
-                        child: TextUtil(
+                        child: const TextUtil(
                           text: "Sign Up",
                           color: Colors.black,
                         ),
@@ -169,10 +169,10 @@ class _SignupViewState extends State<SignupView> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => LoginView()),
+                            MaterialPageRoute(builder: (context) => const LoginView()),
                           );
                         },
-                        child: TextUtil(
+                        child: const TextUtil(
                           text: "Already have an account? Sign In",
                           size: 12,
                           weight: true,

@@ -15,30 +15,44 @@ class EditAccountController {
   void userInformation(BuildContext context) async {
     final firstName = firstNameController.text;
     final lastName = lastNameController.text;
-    final success = await _userService.editUserInformations(firstName, lastName);
+    final success =
+        await _userService.editUserInformations(firstName, lastName);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(success ? 'Modification réussie' : 'Échec de la modification')),
-    );
-    if (success){
-      SharedPrefs.saveUserInformation(firstName, lastName);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                success ? 'Modification réussie' : 'Échec de la modification')),
+      );
+    }
+    if (success) {
+      await SharedPrefs.saveUserInformation(firstName, lastName);
     }
   }
 
   void userPassword(BuildContext context) async {
     final oldPassword = oldPasswordController.text;
     final newPassword = newPasswordController.text;
-    final success = await _userService.editUserPassword(oldPassword, newPassword);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(success ? 'Modification réussie' : 'Échec de la modification')),
-    );
+    final success =
+        await _userService.editUserPassword(oldPassword, newPassword);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                success ? 'Modification réussie' : 'Échec de la modification')),
+      );
+    }
   }
 
   Future<bool> deleteAccount(BuildContext context) async {
     final success = await _userService.deleteUser();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(success ? 'Suppression réussie' : 'Échec de la suppression')),
-    );
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                success ? 'Suppression réussie' : 'Échec de la suppression')),
+      );
+    }
     return success;
   }
 }

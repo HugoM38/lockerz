@@ -8,10 +8,10 @@ class EditAccountPage extends StatefulWidget {
   const EditAccountPage({super.key});
 
   @override
-  _EditAccountPageState createState() => _EditAccountPageState();
+  EditAccountPageState createState() => EditAccountPageState();
 }
 
-class _EditAccountPageState extends State<EditAccountPage> {
+class EditAccountPageState extends State<EditAccountPage> {
   final _formKeyName = GlobalKey<FormState>();
   final _formKeyPassword = GlobalKey<FormState>();
   final _passwordRegExp = RegExp(r'^(?=.*[A-Z])(?=.*\d).{8,}$');
@@ -53,7 +53,9 @@ class _EditAccountPageState extends State<EditAccountPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  const Text('Modifier le nom', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const Text('Modifier le nom',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   TextFormField(
                     controller: _editAccountController.firstNameController,
@@ -94,11 +96,14 @@ class _EditAccountPageState extends State<EditAccountPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  const Text('Modifier le mot de passe', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const Text('Modifier le mot de passe',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   TextFormField(
                     controller: _editAccountController.oldPasswordController,
-                    decoration: const InputDecoration(labelText: 'Ancien mot de passe'),
+                    decoration:
+                        const InputDecoration(labelText: 'Ancien mot de passe'),
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -109,12 +114,13 @@ class _EditAccountPageState extends State<EditAccountPage> {
                   ),
                   TextFormField(
                     controller: _editAccountController.newPasswordController,
-                    decoration: const InputDecoration(labelText: 'Nouveau mot de passe'),
+                    decoration: const InputDecoration(
+                        labelText: 'Nouveau mot de passe'),
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Veuillez entrer un nouveau mot de passe';
-                      } else if(!_passwordRegExp.hasMatch(value)){
+                      } else if (!_passwordRegExp.hasMatch(value)) {
                         return 'Le mot de passe doit faire 8 caractère et doit contenir au moins une majuscule';
                       }
                       return null;
@@ -122,12 +128,14 @@ class _EditAccountPageState extends State<EditAccountPage> {
                   ),
                   TextFormField(
                     controller: _editAccountController.samePasswordController,
-                    decoration: const InputDecoration(labelText: 'Confirmer le nouveau mot de passe'),
+                    decoration: const InputDecoration(
+                        labelText: 'Confirmer le nouveau mot de passe'),
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Veuillez confirmer votre nouveau mot de passe';
-                      } else if (value != _editAccountController.newPasswordController.text) {
+                      } else if (value !=
+                          _editAccountController.newPasswordController.text) {
                         return 'Les mots de passe ne correspondent pas';
                       }
                       return null;
@@ -154,7 +162,8 @@ class _EditAccountPageState extends State<EditAccountPage> {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: const Text('Supprimer le compte'),
-                      content: const Text('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.'),
+                      content: const Text(
+                          'Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.'),
                       actions: <Widget>[
                         TextButton(
                           onPressed: () {
@@ -164,10 +173,17 @@ class _EditAccountPageState extends State<EditAccountPage> {
                         ),
                         TextButton(
                           onPressed: () async {
-                            if(await _editAccountController.deleteAccount(context)){
+                            if (await _editAccountController
+                                .deleteAccount(context)) {
                               SharedPrefs.removeAuthToken();
                               SharedPrefs.removeUserInformation();
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginView()));
+                              if (context.mounted) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginView()));
+                              }
                             }
                           },
                           child: const Text('Supprimer'),

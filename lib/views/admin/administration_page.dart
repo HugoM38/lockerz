@@ -5,11 +5,13 @@ import '../../models/reservation_model.dart';
 import '../shared/navbar.dart';
 
 class AdministrationPage extends StatefulWidget {
+  const AdministrationPage({super.key});
+
   @override
-  _AdministrationPageState createState() => _AdministrationPageState();
+  AdministrationPageState createState() => AdministrationPageState();
 }
 
-class _AdministrationPageState extends State<AdministrationPage> {
+class AdministrationPageState extends State<AdministrationPage> {
   List<Reservation> reservations = [];
 
   @override

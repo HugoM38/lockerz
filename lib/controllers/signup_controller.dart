@@ -14,11 +14,15 @@ class SignupController {
     final email = emailController.text;
     final password = passwordController.text;
 
-    final success = await _authService.register(firstname, lastname, email, password);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(success ? 'Inscription réussie' : 'Échec de l\'inscription')),
-    );
+    final success =
+        await _authService.register(firstname, lastname, email, password);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                success ? 'Inscription réussie' : 'Échec de l\'inscription')),
+      );
+    }
   }
 
   void dispose() {

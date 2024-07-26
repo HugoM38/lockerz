@@ -5,13 +5,13 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   final _formKey = GlobalKey<FormState>();
   int? _selectedLocker;
-  List<String> _selectedUsers = [];
+  final List<String> _selectedUsers = [];
   List<String> _filteredUsers = [];
   String _searchQuery = '';
   bool _termsAccepted = false;
@@ -168,7 +168,7 @@ class _HomePageState extends State<HomePage> {
                     onChanged: _updateSearchQuery,
                   ),
                   const SizedBox(height: 10),
-                  Container(
+                  SizedBox(
                     height: 200, // Adjust height as needed
                     child: ListView(
                       children: _filteredUsers.map((user) {

@@ -11,8 +11,8 @@ class TextUtil extends StatelessWidget {
     this.weight = false,
     this.size = 14,
     this.color,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

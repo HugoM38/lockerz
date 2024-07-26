@@ -13,7 +13,7 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   final LoginController _loginController = LoginController();
-  bool showOption = false; // Ajout de la variable showOption
+  bool showOption = false;
 
   @override
   void dispose() {
@@ -55,7 +55,7 @@ class _LoginViewState extends State<LoginView> {
                         padding: EdgeInsets.all(1),
                         child: CircleAvatar(
                           radius: 30,
-                          backgroundImage: AssetImage('assets/sample_image.png'), // Remplacez par une image par défaut si nécessaire
+                          backgroundImage: AssetImage('assets/sample_image.png'),
                         ),
                       ),
                     ),
@@ -106,9 +106,9 @@ class _LoginViewState extends State<LoginView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Spacer(),
-                    Center(child: TextUtil(text: "Login", weight: true, size: 30)),
+                    const Center(child: TextUtil(text: "Login", weight: true, size: 30)),
                     const Spacer(),
-                    TextUtil(text: "Email"),
+                    const TextUtil(text: "Email"),
                     Container(
                       height: 35,
                       decoration: const BoxDecoration(
@@ -125,7 +125,7 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
                     const Spacer(),
-                    TextUtil(text: "Password"),
+                    const TextUtil(text: "Password"),
                     Container(
                       height: 35,
                       decoration: const BoxDecoration(
@@ -151,7 +151,7 @@ class _LoginViewState extends State<LoginView> {
                           color: Colors.white,
                         ),
                         const SizedBox(width: 10),
-                        Expanded(
+                        const Expanded(
                           child: TextUtil(
                             text: "Remember Me , FORGET PASSWORD",
                             size: 12,
@@ -180,7 +180,7 @@ class _LoginViewState extends State<LoginView> {
                         onPressed: () {
                           _loginController.login(context);
                         },
-                        child: TextUtil(
+                        child: const TextUtil(
                           text: "Log In",
                           color: Colors.black,
                         ),
@@ -192,10 +192,10 @@ class _LoginViewState extends State<LoginView> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => SignupView()),
+                            MaterialPageRoute(builder: (context) => const SignupView()),
                           );
                         },
-                        child: TextUtil(
+                        child: const TextUtil(
                           text: "Don't have an account? REGISTER",
                           size: 12,
                           weight: true,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lockerz/models/reservation_model.dart';
-import 'package:lockerz/services/reservation_service.dart';
 import '../../controllers/administration_controller.dart';
 
 class AdministrationItem extends StatefulWidget {
@@ -14,10 +13,10 @@ class AdministrationItem extends StatefulWidget {
   });
 
   @override
-  _AdministrationItemState createState() => _AdministrationItemState();
+  AdministrationItemState createState() => AdministrationItemState();
 }
 
-class _AdministrationItemState extends State<AdministrationItem> {
+class AdministrationItemState extends State<AdministrationItem> {
   final AdministrationController _administrationController = AdministrationController();
 
   @override
@@ -33,7 +32,7 @@ class _AdministrationItemState extends State<AdministrationItem> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirmation'),
+          title: const Text('Confirmation'),
           content: Text('Êtes-vous sûr de vouloir $action cette réservation ?'),
           actions: <Widget>[
             TextButton(

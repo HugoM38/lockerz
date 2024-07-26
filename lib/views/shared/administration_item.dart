@@ -85,7 +85,12 @@ class AdministrationItemState extends State<AdministrationItem> {
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("${_administrationController.reservation.owner}:${_administrationController.reservation.locker}"),
+                      Expanded(
+                        child: Text(
+                          "${_administrationController.reservation.owner}:${_administrationController.reservation.locker}",
+                          overflow: TextOverflow.ellipsis, // Gestion du débordement du texte
+                        ),
+                      ),
                       Row(
                         children: [
                           TextButton(
@@ -107,7 +112,10 @@ class AdministrationItemState extends State<AdministrationItem> {
                 );
               },
               body: ListTile(
-                title: Text(_administrationController.reservation.members.toString()),
+                title: Text(
+                  _administrationController.reservation.members.toString(),
+                  overflow: TextOverflow.ellipsis, // Gestion du débordement du texte
+                ),
               ),
               isExpanded: _isExpanded,
             ),

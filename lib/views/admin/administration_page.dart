@@ -37,14 +37,49 @@ class AdministrationPageState extends State<AdministrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const NavBar(),
-      body: ListView(
-        children: <Widget>[
-          for (var item in reservations)
-            AdministrationItem(
-              reservation: item,
-              onRemove: () => _removeReservation(item),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 600, // Limite la largeur de la liste
             ),
-        ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Liste des réservations en attente',
+                  style: TextStyle(
+                    fontSize: 24, // Taille de police personnalisée
+                    fontWeight: FontWeight.bold, // Poids de police personnalisée
+                    color: Theme.of(context).colorScheme.primary, // Couleur personnalisée
+                  ),
+                ),
+                const SizedBox(height: 16),
+                reservations.isEmpty
+                    ? const Expanded(
+                  child: Center(
+                    child: Text(
+                      'Aucune réservation en attente',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ),
+                )
+                    : Expanded(
+                  child: ListView.builder(
+                    itemCount: reservations.length,
+                    itemBuilder: (context, index) {
+                      return AdministrationItem(
+                        reservation: reservations[index],
+                        onRemove: () => _removeReservation(reservations[index]),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

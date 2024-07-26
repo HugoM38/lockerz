@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:lockerz/models/reservation_model.dart';
+import '../models/user_model.dart';
 import '../utils/shared_prefs.dart';
 
 class ReservationService {
@@ -42,6 +43,31 @@ class ReservationService {
         }),
       );
       if (response.statusCode != 200) {
+        debugPrint(response.body);
+        return false;
+      }
+      return true;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<bool> createReservation(String lockerId, List<String> membersId) async {
+    print(await SharedPrefs.getAuthToken());
+    Uri url = Uri.parse("$baseUrl/create");
+    try {
+      final response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${await SharedPrefs.getAuthToken()}'
+        },
+        body: jsonEncode({
+          'lockerId': lockerId,
+          'members': membersId,
+        }),
+      );
+      if (response.statusCode != 201) {
         debugPrint(response.body);
         return false;
       }

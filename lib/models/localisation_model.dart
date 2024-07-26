@@ -1,8 +1,6 @@
-import 'dart:ffi';
-
 class Localisation {
   String name;
-  Bool accessibility;
+  bool accessibility;
 
   Localisation({
     required this.name,

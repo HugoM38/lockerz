@@ -43,7 +43,9 @@ class HomePageState extends State<HomePage> {
               Expanded(
                 child: TabBarView(
                   children: _controller.localisations.map((localisation) {
-                    final filteredLockers = _controller.lockers.where((locker) => locker.localisation.name == localisation).toList();
+                    final filteredLockers = _controller.lockers
+                        .where((locker) => locker.localisation.name == localisation)
+                        .toList();
                     return ListView(
                       children: <Widget>[
                         Form(
@@ -164,6 +166,17 @@ class HomePageState extends State<HomePage> {
                                   _controller.submitForm(context);
                                 },
                                 child: const Text('Valider'),
+                              ),
+                              const SizedBox(height: 20),
+                              const Text(
+                                'Règles associées aux cadenas:',
+                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 10),
+                              const Text(
+                                'Cadenas à clés : Obligation de déposer un double de la clé à l\'accueil.\n'
+                                    'Cadenas à code : Obligation de déposer le code à l\'accueil.',
+                                style: TextStyle(fontSize: 16),
                               ),
                             ],
                           ),

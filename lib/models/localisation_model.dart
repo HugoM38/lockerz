@@ -1,14 +1,17 @@
 class Localisation {
+  String id;
   String name;
   bool accessibility;
 
   Localisation({
+    required this.id,
     required this.name,
     required this.accessibility,
   });
 
   Map<String, dynamic> toJson() {
     return {
+      '_id': id,
       'name': name,
       'accessibility': accessibility,
     };
@@ -16,8 +19,9 @@ class Localisation {
 
   factory Localisation.fromJson(Map<String, dynamic> json) {
     return Localisation(
-      name: json['name'],
-      accessibility: json['localisation'],
+      id: json['_id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      accessibility: json['accessibility'] as bool? ?? false,
     );
   }
 }

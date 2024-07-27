@@ -4,9 +4,8 @@ import 'package:lockerz/services/locker_service.dart';
 import 'package:lockerz/services/user_service.dart';
 import 'package:lockerz/views/shared/navbar.dart';
 import 'package:lockerz/services/reservation_service.dart';
-
+import 'package:lockerz/utils/shared_prefs.dart';
 import '../../models/locker_model.dart';
-import '../../utils/shared_prefs.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,6 +27,8 @@ class HomePageState extends State<HomePage> {
   List<Locker> _lockers = [];
   List<String> _localisations = [];
 
+  User? _currentUser;
+
   @override
   void initState() {
     super.initState();
@@ -35,14 +36,18 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> _initializeControllers() async {
+    // Récupérer l'utilisateur connecté
+    _currentUser = await SharedPrefs.getUser();
+
+    // Récupérer les utilisateurs et casiers
     List<User> users = await UserService().getUsers();
     List<Locker> lockers = await LockerService().getLockers();
 
     setState(() {
-      _users = users;
-      _filteredUsers = users;
+      _users = users.where((user) => user.id != _currentUser?.id).toList();
+      _filteredUsers = _users;
       _lockers = lockers;
-      _localisations = lockers.map((locker) => locker.localisation).toSet().toList();
+      _localisations = lockers.map((locker) => locker.localisation.name).toSet().toList();
     });
   }
 
@@ -53,7 +58,7 @@ class HomePageState extends State<HomePage> {
           .where((user) =>
       user.firstname.toLowerCase().contains(query.toLowerCase()) ||
           user.lastname.toLowerCase().contains(query.toLowerCase()) ||
-          user.email!.toLowerCase().contains(query.toLowerCase()))
+          user.email.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -117,7 +122,7 @@ class HomePageState extends State<HomePage> {
               Expanded(
                 child: TabBarView(
                   children: _localisations.map((localisation) {
-                    final filteredLockers = _lockers.where((locker) => locker.localisation == localisation).toList();
+                    final filteredLockers = _lockers.where((locker) => locker.localisation.name == localisation).toList();
                     return ListView(
                       children: <Widget>[
                         Form(

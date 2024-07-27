@@ -87,7 +87,7 @@ class AdministrationItemState extends State<AdministrationItem> {
                     children: [
                       Expanded(
                         child: Text(
-                          "${_administrationController.reservation.owner}:${_administrationController.reservation.locker}",
+                          "${_administrationController.reservation.owner.firstname} ${_administrationController.reservation.owner.lastname} : Casier ${_administrationController.reservation.locker.number}",
                           overflow: TextOverflow.ellipsis, // Gestion du débordement du texte
                         ),
                       ),
@@ -113,7 +113,9 @@ class AdministrationItemState extends State<AdministrationItem> {
               },
               body: ListTile(
                 title: Text(
-                  _administrationController.reservation.members.toString(),
+                  _administrationController.reservation.members.isEmpty
+                      ? "Aucun membre en plus du propriétaire."
+                      : "Membres: ${_administrationController.reservation.members.map((member) => "${member.firstname} ${member.lastname}").join(', ')}",
                   overflow: TextOverflow.ellipsis, // Gestion du débordement du texte
                 ),
               ),

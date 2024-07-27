@@ -78,12 +78,6 @@ class HomePageState extends State<HomePage> {
         );
         return;
       }
-      if (_selectedUsers.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Veuillez sélectionner au moins un utilisateur.')),
-        );
-        return;
-      }
       if (!_termsAccepted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Veuillez accepter les termes d\'utilisation.')),

@@ -1,18 +1,16 @@
-import 'package:lockerz/models/reservation_model.dart';
-
 class Locker {
   String id;
   int number;
   String localisation;
   String status;
-  List<Reservation>? reservations;
+  List<String> reservations;
 
   Locker({
     required this.id,
     required this.number,
     required this.localisation,
     required this.status,
-    this.reservations,
+    required this.reservations,
   });
 
   Map<String, dynamic> toJson() {
@@ -27,11 +25,11 @@ class Locker {
 
   factory Locker.fromJson(Map<String, dynamic> json) {
     return Locker(
-      id: json['_id'],
-      number: json['number'],
-      localisation: json['localisation'],
-      status: json['status'],
-      reservations: json['reservations'],
+      id: json['_id'] ?? '',
+      number: json['number'] ?? 0,
+      localisation: json['localisation'] ?? '',
+      status: json['status'] ?? '',
+      reservations: List<String>.from(json['reservations'] ?? []),
     );
   }
 }

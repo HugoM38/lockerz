@@ -1,8 +1,12 @@
+import 'package:lockerz/models/user_model.dart';
+
+import 'locker_model.dart';
+
 class Reservation {
   String id;
-  String locker;
-  String owner;
-  List<String> members;
+  Locker locker;
+  User owner;
+  List<User> members;
   String status;
 
   Reservation({
@@ -16,20 +20,20 @@ class Reservation {
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
-      'members': members,
-      'owner': owner,
-      'locker': locker,
+      'members': members.map((u) => u.toJson()).toList(),
+      'owner': owner.toJson(),
+      'locker': locker.toJson(),
       'status': status,
     };
   }
 
   factory Reservation.fromJson(Map<String, dynamic> json) {
     return Reservation(
-      id: json['_id'],
-      members: List<String>.from(json['members']),
-      owner: json['owner'],
-      locker: json['locker'],
-      status: json['status'],
+      id: json['_id'] ?? '',
+      members: (json['members'] as List).map((i) => User.fromJson(i)).toList(),
+      owner: User.fromJson(json['owner']),
+      locker: Locker.fromJson(json['locker']),
+      status: json['status'] ?? '',
     );
   }
 }

@@ -14,7 +14,6 @@ class NavBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         TextButton(
           onPressed: () => {
-            debugPrint("Administration"),
             Navigator.push(
               context, MaterialPageRoute(builder: (context) => const AdministrationPage()),
             )

@@ -2,8 +2,7 @@ class User {
   String id;
   String firstname;
   String lastname;
-  String? email;
-  String? password;
+  String email;
   String role;
 
   User({
@@ -11,8 +10,7 @@ class User {
     required this.firstname,
     required this.lastname,
     required this.role,
-    this.email,
-    this.password,
+    required this.email,
   });
 
   Map<String, dynamic> toJson() {
@@ -22,7 +20,6 @@ class User {
       'lastname': lastname,
       'role': role,
       'email': email,
-      'password': password,
     };
   }
 
@@ -32,8 +29,7 @@ class User {
       firstname: json['firstname'] ?? '',
       lastname: json['lastname'] ?? '',
       role: json['role'] ?? '',
-      email: json['email'],
-      password: json['password'],
+      email: json['email'] ?? '',
     );
   }
 }

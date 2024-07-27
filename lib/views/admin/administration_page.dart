@@ -27,9 +27,9 @@ class AdministrationPageState extends State<AdministrationPage> {
     });
   }
 
-  void _removeReservation(Reservation reservation) {
+  void _removeReservation(String reservationId) {
     setState(() {
-      reservations.remove(reservation);
+      reservations.removeWhere((reservation) => reservation.id == reservationId);
     });
   }
 
@@ -70,8 +70,9 @@ class AdministrationPageState extends State<AdministrationPage> {
                     itemCount: reservations.length,
                     itemBuilder: (context, index) {
                       return AdministrationItem(
+                        key: ValueKey(reservations[index].id), // Assurez-vous d'utiliser une clé unique
                         reservation: reservations[index],
-                        onRemove: () => _removeReservation(reservations[index]),
+                        onRemove: () => _removeReservation(reservations[index].id),
                       );
                     },
                   ),

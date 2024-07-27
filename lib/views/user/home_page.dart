@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lockerz/models/user_model.dart';
-import 'package:lockerz/services/locker_service.dart';
-import 'package:lockerz/services/user_service.dart';
 import 'package:lockerz/views/shared/navbar.dart';
-import 'package:lockerz/services/reservation_service.dart';
-import 'package:lockerz/utils/shared_prefs.dart';
-import '../../models/locker_model.dart';
+import '/controllers/home_page_controller.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,98 +10,24 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  final _formKey = GlobalKey<FormState>();
-  String? _selectedLockerId;
-
-  List<User> _users = [];
-  List<User> _filteredUsers = [];
-  List<User> _selectedUsers = [];
-  String _searchQuery = '';
-  bool _termsAccepted = false;
-
-  List<Locker> _lockers = [];
-  List<String> _localisations = [];
-
-  User? _currentUser;
+  late HomePageController _controller;
 
   @override
   void initState() {
     super.initState();
+    _controller = HomePageController();
     _initializeControllers();
   }
 
   Future<void> _initializeControllers() async {
-    // Récupérer l'utilisateur connecté
-    _currentUser = await SharedPrefs.getUser();
-
-    // Récupérer les utilisateurs et casiers
-    List<User> users = await UserService().getUsers();
-    List<Locker> lockers = await LockerService().getLockers();
-
-    setState(() {
-      _users = users.where((user) => user.id != _currentUser?.id).toList();
-      _filteredUsers = _users;
-      _lockers = lockers;
-      _localisations = lockers.map((locker) => locker.localisation.name).toSet().toList();
-    });
-  }
-
-  void _updateSearchQuery(String query) {
-    setState(() {
-      _searchQuery = query;
-      _filteredUsers = _users
-          .where((user) =>
-      user.firstname.toLowerCase().contains(query.toLowerCase()) ||
-          user.lastname.toLowerCase().contains(query.toLowerCase()) ||
-          user.email.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    });
-  }
-
-  void _onUserSelected(User user, bool isSelected) {
-    setState(() {
-      if (isSelected) {
-        if (_selectedUsers.length < 4) {
-          _selectedUsers.add(user);
-        }
-      } else {
-        _selectedUsers.remove(user);
-      }
-    });
-  }
-
-  void _submitForm() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      if (_selectedLockerId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Veuillez sélectionner un casier.')),
-        );
-        return;
-      }
-      if (!_termsAccepted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Veuillez accepter les termes d\'utilisation.')),
-        );
-        return;
-      }
-
-      final result = await ReservationService().createReservation(
-        _selectedLockerId!,
-        _selectedUsers.map((u) => u.id).toList(),
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result ? 'Formulaire soumis avec succès!' : 'Erreur de création de réservation'),
-        ),
-      );
-    }
+    await _controller.initialize();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: _localisations.length,
+      length: _controller.localisations.length,
       child: Scaffold(
         appBar: const NavBar(),
         body: Padding(
@@ -115,18 +36,18 @@ class HomePageState extends State<HomePage> {
             children: [
               TabBar(
                 isScrollable: true,
-                tabs: _localisations.map((localisation) {
+                tabs: _controller.localisations.map((localisation) {
                   return Tab(text: localisation);
                 }).toList(),
               ),
               Expanded(
                 child: TabBarView(
-                  children: _localisations.map((localisation) {
-                    final filteredLockers = _lockers.where((locker) => locker.localisation.name == localisation).toList();
+                  children: _controller.localisations.map((localisation) {
+                    final filteredLockers = _controller.lockers.where((locker) => locker.localisation.name == localisation).toList();
                     return ListView(
                       children: <Widget>[
                         Form(
-                          key: _formKey,
+                          key: _controller.formKey,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
@@ -148,13 +69,13 @@ class HomePageState extends State<HomePage> {
                                 itemBuilder: (BuildContext context, int index) {
                                   final locker = filteredLockers[index];
                                   final isAvailable = locker.status == 'available';
-                                  final isSelected = _selectedLockerId == locker.id;
+                                  final isSelected = _controller.selectedLockerId == locker.id;
 
                                   return GestureDetector(
                                     onTap: isAvailable
                                         ? () {
                                       setState(() {
-                                        _selectedLockerId = locker.id;
+                                        _controller.selectedLockerId = locker.id;
                                       });
                                     }
                                         : null,
@@ -192,19 +113,27 @@ class HomePageState extends State<HomePage> {
                                   labelText: 'Rechercher un utilisateur',
                                   border: OutlineInputBorder(),
                                 ),
-                                onChanged: _updateSearchQuery,
+                                onChanged: (query) {
+                                  setState(() {
+                                    _controller.updateSearchQuery(query);
+                                  });
+                                },
                               ),
                               const SizedBox(height: 10),
                               SizedBox(
                                 height: 200, // Adjust height as needed
                                 child: ListView(
-                                  children: _filteredUsers.map((user) {
-                                    final isSelected = _selectedUsers.contains(user);
+                                  children: _controller.filteredUsers.map((user) {
+                                    final isSelected = _controller.selectedUsers.contains(user);
                                     return CheckboxListTile(
                                       title: Text('${user.firstname} ${user.lastname} (${user.email})'),
                                       value: isSelected,
-                                      onChanged: _selectedUsers.length < 4 || isSelected
-                                          ? (value) => _onUserSelected(user, value!)
+                                      onChanged: _controller.selectedUsers.length < 4 || isSelected
+                                          ? (value) {
+                                        setState(() {
+                                          _controller.onUserSelected(user, value!);
+                                        });
+                                      }
                                           : null,
                                     );
                                   }).toList(),
@@ -214,10 +143,10 @@ class HomePageState extends State<HomePage> {
                               Row(
                                 children: [
                                   Checkbox(
-                                    value: _termsAccepted,
+                                    value: _controller.termsAccepted,
                                     onChanged: (bool? value) {
                                       setState(() {
-                                        _termsAccepted = value ?? false;
+                                        _controller.termsAccepted = value ?? false;
                                       });
                                     },
                                   ),
@@ -231,7 +160,9 @@ class HomePageState extends State<HomePage> {
                               ),
                               const SizedBox(height: 20),
                               ElevatedButton(
-                                onPressed: _submitForm,
+                                onPressed: () {
+                                  _controller.submitForm(context);
+                                },
                                 child: const Text('Valider'),
                               ),
                             ],

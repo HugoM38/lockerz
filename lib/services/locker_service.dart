@@ -9,7 +9,7 @@ class LockerService {
 
   Future<List<Locker>> getLockers() async {
     Uri url = Uri.parse("$baseUrl/");
-    //try {
+    try {
       final response = await http.get(
           url,
           headers: <String, String>{
@@ -19,14 +19,12 @@ class LockerService {
       if (response.statusCode != 200) {
         debugPrint(response.body);
       }
-      debugPrint(response.body);
-
       List<dynamic> body = jsonDecode(response.body);
       List<Locker> lockers = body.map((dynamic item) => Locker.fromJson(item)).toList();
       return lockers;
-    /**} catch (e) {
+    } catch (e) {
       throw Exception(e.toString());
-    }*/
+    }
   }
 
   Future<bool> valideToRefuseReservation(String reservationId, String status) async {

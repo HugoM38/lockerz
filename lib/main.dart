@@ -4,6 +4,7 @@ import 'package:lockerz/views/edit_account_page.dart';
 import 'package:lockerz/views/user/home_page.dart';
 import 'views/login_view.dart';
 import 'views/signup_view.dart';
+import 'views/verification_view.dart';
 
 void main() {
   runApp(const Lockerz());

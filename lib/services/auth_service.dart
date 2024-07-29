@@ -3,8 +3,7 @@ import 'package:http/http.dart' as http;
 import '../utils/shared_prefs.dart';
 
 class AuthService {
-  static const String baseUrl =
-      'http://localhost:5001/api/auth';
+  static const String baseUrl = 'http://localhost:5001/api/auth';
 
   Future<http.Response> login(String email, String password) async {
     final response = await http.post(
@@ -42,6 +41,33 @@ class AuthService {
       final responseData = jsonDecode(response.body);
       final token = responseData['token'];
 
+      await SharedPrefs.saveAuthToken(token);
+      await SharedPrefs.saveUserInformation(jsonEncode(responseData['user']));
+    }
+
+    return response;
+  }
+
+  Future<http.Response> sendCode(String email) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/sendCode'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+    return response;
+  }
+
+  Future<http.Response> checkCode(String email, String code) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/checkCode'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'code': code}),
+    );
+
+    if (response.statusCode == 200) {
+
+      final responseData = jsonDecode(response.body);
+      final token = responseData['token'];
       await SharedPrefs.saveAuthToken(token);
       await SharedPrefs.saveUserInformation(jsonEncode(responseData['user']));
     }

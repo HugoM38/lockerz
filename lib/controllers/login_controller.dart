@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../views/verification_view.dart';
 
 class LoginController {
   final TextEditingController emailController = TextEditingController();
@@ -53,6 +54,17 @@ class LoginController {
             const SnackBar(content: Text('Connexion réussie')),
           );
           Navigator.of(context).pushReplacementNamed('/home');
+        } else if (response.statusCode == 403) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content:
+                    Text('Email non vérifié. Veuillez vérifier votre email.')),
+          );
+          await _authService.sendCode(email);
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => VerificationView(
+                    email: email,
+                  )));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(jsonDecode(response.body)["error"])),

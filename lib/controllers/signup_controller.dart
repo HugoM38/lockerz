@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:lockerz/views/verification_view.dart';
 import '../services/auth_service.dart';
 
 class SignupController {
@@ -15,7 +16,10 @@ class SignupController {
     final email = emailController.text;
     final password = passwordController.text;
 
-    if (firstname.isEmpty || lastname.isEmpty || email.isEmpty || password.isEmpty) {
+    if (firstname.isEmpty ||
+        lastname.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Veuillez remplir tous les champs')),
       );
@@ -31,28 +35,41 @@ class SignupController {
 
     if (RegExp(r'^(?=.*[A-Z])(?=.*\d).{8,}$').hasMatch(password) == false) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre')),
+        const SnackBar(
+            content: Text(
+                'Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre')),
       );
       return;
     }
 
     if (!email.endsWith("@myges.fr")) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez saisir un email de l\'école finissant par "myges.fr"')),
+        const SnackBar(
+            content: Text(
+                'Veuillez saisir un email de l\'école finissant par "myges.fr"')),
       );
       return;
     }
 
     try {
-      final response = await _authService.register(firstname, lastname, email, password);
+      final response =
+          await _authService.register(firstname, lastname, email, password);
 
-      if (context.mounted) {
-        if (response.statusCode == 201) {
+      if (response.statusCode == 201) {
+        await _authService.sendCode(email);
+        if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Inscription réussie')),
+            const SnackBar(
+                content:
+                    Text('Inscription réussie. Code de vérification envoyé.')),
           );
-          Navigator.of(context).pushReplacementNamed('/home');
-        } else {
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => VerificationView(
+                    email: email,
+                  )));
+        }
+      } else {
+        if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(jsonDecode(response.body)["error"])),
           );
@@ -61,7 +78,8 @@ class SignupController {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Une erreur est survenue lors de l\'inscription')),
+          const SnackBar(
+              content: Text('Une erreur est survenue lors de l\'inscription')),
         );
       }
     }

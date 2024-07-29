@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lockerz/services/reservation_service.dart';
 import 'package:lockerz/views/shared/administration_item.dart';
+import 'package:lockerz/views/admin/admin_home_page.dart'; // Import de AdminHomePage
 import '../../models/reservation_model.dart';
 import '../shared/navbar.dart';
 
@@ -58,29 +59,39 @@ class AdministrationPageState extends State<AdministrationPage> {
                 const SizedBox(height: 16),
                 reservations.isEmpty
                     ? const Expanded(
-                  child: Center(
-                    child: Text(
-                      'Aucune réservation en attente',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                  ),
-                )
+                        child: Center(
+                          child: Text(
+                            'Aucune réservation en attente',
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          ),
+                        ),
+                      )
                     : Expanded(
-                  child: ListView.builder(
-                    itemCount: reservations.length,
-                    itemBuilder: (context, index) {
-                      return AdministrationItem(
-                        key: ValueKey(reservations[index].id), // Assurez-vous d'utiliser une clé unique
-                        reservation: reservations[index],
-                        onRemove: () => _removeReservation(reservations[index].id),
-                      );
-                    },
-                  ),
-                ),
+                        child: ListView.builder(
+                          itemCount: reservations.length,
+                          itemBuilder: (context, index) {
+                            return AdministrationItem(
+                              key: ValueKey(reservations[index].id), // Assurez-vous d'utiliser une clé unique
+                              reservation: reservations[index],
+                              onRemove: () => _removeReservation(reservations[index].id),
+                            );
+                          },
+                        ),
+                      ),
               ],
             ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AdminHomePage()),
+          );
+        },
+        child: const Icon(Icons.admin_panel_settings),
+        tooltip: 'Accéder à la page administrateur',
       ),
     );
   }

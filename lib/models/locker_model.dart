@@ -1,5 +1,4 @@
 import 'package:lockerz/models/localisation_model.dart';
-import 'package:lockerz/models/reservation_model.dart';
 
 class Locker {
   String id;

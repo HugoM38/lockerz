@@ -6,14 +6,12 @@ class Locker {
   int number;
   Localisation localisation;
   String status;
-  List<Reservation> reservations;
 
   Locker({
     required this.id,
     required this.number,
     required this.localisation,
     required this.status,
-    required this.reservations,
   });
 
   Map<String, dynamic> toJson() {
@@ -22,7 +20,6 @@ class Locker {
       'number': number,
       'localisation': localisation.toJson(),
       'status': status,
-      'reservations': reservations.map((u) => u.toJson()).toList(),
     };
   }
 
@@ -32,9 +29,6 @@ class Locker {
       number: json['number'] as int? ?? 0,
       localisation: Localisation.fromJson(json['localisation'] as Map<String, dynamic>),
       status: json['status'] as String? ?? '',
-      reservations: (json['reservations'] as List<dynamic>? ?? [])
-          .map((i) => Reservation.fromJson(i as Map<String, dynamic>))
-          .toList(),
     );
   }
 }

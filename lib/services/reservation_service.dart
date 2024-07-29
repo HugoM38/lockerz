@@ -52,7 +52,6 @@ class ReservationService {
   }
 
   Future<bool> createReservation(String lockerId, List<String> membersId) async {
-    print(await SharedPrefs.getAuthToken());
     Uri url = Uri.parse("$baseUrl/create");
     try {
       final response = await http.post(
@@ -71,6 +70,31 @@ class ReservationService {
         return false;
       }
       return true;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<Reservation?> getCurrentReservation() async {
+    Uri url = Uri.parse("$baseUrl/getCurrentReservation");
+    try {
+      final response = await http.get(
+          url,
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ${await SharedPrefs.getAuthToken()}'
+          });
+      if (response.statusCode != 200) {
+        debugPrint(response.body);
+        return null;
+      }
+      //debugPrint(response.body);
+
+      dynamic body = jsonDecode(response.body);
+      if (body != null && body.isNotEmpty) {
+        return Reservation.fromJson(body);
+      }
+      return null;
     } catch (e) {
       throw Exception(e.toString());
     }

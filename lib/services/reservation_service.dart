@@ -77,7 +77,7 @@ class ReservationService {
 
   Future<Reservation?> getCurrentReservation() async {
     Uri url = Uri.parse("$baseUrl/getCurrentReservation");
-    try {
+    //try {
       final response = await http.get(
           url,
           headers: <String, String>{
@@ -88,15 +88,15 @@ class ReservationService {
         debugPrint(response.body);
         return null;
       }
-      //debugPrint(response.body);
-
-      dynamic body = jsonDecode(response.body);
-      if (body != null && body.isNotEmpty) {
-        return Reservation.fromJson(body);
+      debugPrint(response.body);
+      List<dynamic> body = jsonDecode(response.body);
+      if (body.isNotEmpty) {
+        List<Reservation> reservations = body.map((dynamic item) => Reservation.fromJson(item)).toList();
+        return reservations[0];
       }
       return null;
-    } catch (e) {
+    /**} catch (e) {
       throw Exception(e.toString());
-    }
+    }*/
   }
 }

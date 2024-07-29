@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lockerz/views/shared/navbar.dart';
 import '/controllers/home_page_controller.dart';
-import 'package:lockerz/models/reservation_model.dart';
 import 'package:lockerz/services/reservation_service.dart';
+import 'package:lockerz/models/reservation_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,62 +13,60 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   late HomePageController _controller;
-  Reservation? _userReservation;
+  Reservation? _currentReservation;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _controller = HomePageController();
     _initializeControllers();
-    _loadUserReservation();
   }
 
   Future<void> _initializeControllers() async {
+    _currentReservation = await ReservationService().getCurrentReservation();
     await _controller.initialize();
-    setState(() {});
-  }
-
-  Future<void> _loadUserReservation() async {
-    final reservation = await ReservationService().getCurrentReservation();
     setState(() {
-      _userReservation = reservation;
+      _isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: const NavBar(),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return DefaultTabController(
       length: _controller.localisations.length,
       child: Scaffold(
         appBar: const NavBar(),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: _userReservation != null ? _buildReservationInfo() : _buildReservationForm(),
+          child: _currentReservation != null ? _buildReservationDetails() : _buildReservationForm(),
         ),
       ),
     );
   }
 
-  Widget _buildReservationInfo() {
+  Widget _buildReservationDetails() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Locker Details',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
+        Text('Réservation actuelle', style: Theme.of(context).textTheme.headlineLarge),
         const SizedBox(height: 10),
-        Text('Locker Number: ${_userReservation!.locker.number}'),
-        Text('Locker Status: ${_userReservation!.locker.status}'),
-        Text('Locker Localisation: ${_userReservation!.locker.localisation.name}'),
+        Text('Casier : ${_currentReservation!.locker.number}'),
+        Text('Localisation : ${_currentReservation!.locker.localisation.name}'),
+        Text('Propriétaire : ${_currentReservation!.owner.firstname} ${_currentReservation!.owner.lastname}'),
+        const SizedBox(height: 10),
+        Text('Membres :'),
+        for (var member in _currentReservation!.members)
+          Text('${member.firstname} ${member.lastname} (${member.email})'),
         const SizedBox(height: 20),
-        const Text(
-          'Reservation Details',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 10),
-        Text('Reservation Status: ${_userReservation!.status}'),
-        // Add more details if necessary
+        Text('Statut : ${_currentReservation!.status}'),
       ],
     );
   }

@@ -5,6 +5,7 @@ import 'package:lockerz/services/user_service.dart';
 import 'package:lockerz/services/reservation_service.dart';
 import 'package:lockerz/utils/shared_prefs.dart';
 import '../../models/locker_model.dart';
+import '../../models/reservation_model.dart';
 
 class HomePageController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -17,6 +18,7 @@ class HomePageController {
   List<Locker> lockers = [];
   List<String> localisations = [];
   User? currentUser;
+  Reservation? currentReservation;
 
   Future<void> initialize() async {
     // Récupérer l'utilisateur connecté
@@ -30,6 +32,9 @@ class HomePageController {
     filteredUsers = users;
     lockers = fetchedLockers;
     localisations = lockers.map((locker) => locker.localisation.name).toSet().toList();
+
+    // Récupérer la réservation actuelle
+    currentReservation = await ReservationService().getCurrentReservation();
   }
 
   void updateSearchQuery(String query) {
@@ -75,6 +80,39 @@ class HomePageController {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result ? 'Formulaire soumis avec succès!' : 'Erreur de création de réservation'),
+        ),
+      );
+    }
+  }
+
+  Future<void> terminateReservation(BuildContext context) async {
+    if (currentReservation != null) {
+      final result = await ReservationService().terminateReservation(currentReservation!.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result ? 'Réservation terminée avec succès!' : 'Erreur de terminaison de réservation'),
+        ),
+      );
+    }
+  }
+
+  Future<void> cancelReservation(BuildContext context) async {
+    if (currentReservation != null) {
+      final result = await ReservationService().terminateReservation(currentReservation!.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result ? 'Réservation annulée avec succès!' : 'Erreur d\'annulation de réservation'),
+        ),
+      );
+    }
+  }
+
+  Future<void> retireFromLocker(BuildContext context) async {
+    if (currentReservation != null) {
+      final result = await ReservationService().leaveReservation(currentReservation!.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result ? 'Vous vous êtes retiré du casier avec succès!' : 'Erreur de retrait du casier'),
         ),
       );
     }

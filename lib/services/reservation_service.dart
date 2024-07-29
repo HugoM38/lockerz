@@ -77,7 +77,7 @@ class ReservationService {
 
   Future<Reservation?> getCurrentReservation() async {
     Uri url = Uri.parse("$baseUrl/getCurrentReservation");
-    //try {
+    try {
       final response = await http.get(
           url,
           headers: <String, String>{
@@ -88,15 +88,60 @@ class ReservationService {
         debugPrint(response.body);
         return null;
       }
-      debugPrint(response.body);
       List<dynamic> body = jsonDecode(response.body);
       if (body.isNotEmpty) {
         List<Reservation> reservations = body.map((dynamic item) => Reservation.fromJson(item)).toList();
         return reservations[0];
       }
       return null;
-    /**} catch (e) {
+    } catch (e) {
       throw Exception(e.toString());
-    }*/
+    }
+  }
+
+  Future<bool> terminateReservation(String reservationId) async {
+    Uri url = Uri.parse("$baseUrl/terminateReservation");
+    try {
+      final response = await http.patch(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${await SharedPrefs.getAuthToken()}'
+        },
+        body: jsonEncode({
+          'reservationId': reservationId,
+        }),
+      );
+      if (response.statusCode != 200) {
+        debugPrint(response.body);
+        return false;
+      }
+      return true;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<bool> leaveReservation(String reservationId) async {
+    Uri url = Uri.parse("$baseUrl/leaveReservation");
+    try {
+      final response = await http.patch(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${await SharedPrefs.getAuthToken()}'
+        },
+        body: jsonEncode({
+          'reservationId': reservationId,
+        }),
+      );
+      if (response.statusCode != 200) {
+        debugPrint(response.body);
+        return false;
+      }
+      return true;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
   }
 }

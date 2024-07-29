@@ -53,6 +53,10 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget _buildReservationDetails() {
+    final isOwner = _controller.currentUser?.id == _currentReservation!.owner.id;
+    final isPending = _currentReservation!.status == 'pending';
+    final isMember = _currentReservation!.members.any((member) => member.id == _controller.currentUser?.id);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -67,6 +71,25 @@ class HomePageState extends State<HomePage> {
           Text('${member.firstname} ${member.lastname} (${member.email})'),
         const SizedBox(height: 20),
         Text('Statut : ${_currentReservation!.status}'),
+        const SizedBox(height: 20),
+        if (isMember) ...[
+          ElevatedButton(
+            onPressed: () => _controller.retireFromLocker(context),
+            child: const Text('Se retirer du casier'),
+          ),
+        ] else if (isOwner) ...[
+          if (isPending) ...[
+            ElevatedButton(
+              onPressed: () => _controller.cancelReservation(context),
+              child: const Text('Annuler la réservation'),
+            ),
+          ] else ...[
+            ElevatedButton(
+              onPressed: () => _controller.terminateReservation(context),
+              child: const Text('Terminer la réservation'),
+            ),
+          ],
+        ],
       ],
     );
   }

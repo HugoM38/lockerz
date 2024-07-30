@@ -50,4 +50,25 @@ class LockerService {
       throw Exception(e.toString());
     }
   }
+
+  Future<bool> createLocker(Map<String, dynamic> lockerData) async {
+    Uri url = Uri.parse("$baseUrl/create");
+    try {
+      final response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${await SharedPrefs.getAuthToken()}'
+        },
+        body: jsonEncode(lockerData),
+      );
+      if (response.statusCode != 201) {
+        debugPrint(response.body);
+        return false;
+      }
+      return true;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 }

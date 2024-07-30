@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:lockerz/views/login_view.dart';
+import 'package:lockerz/views/auth/login_view.dart';
 import 'package:lockerz/views/shared/navbar.dart';
 import 'package:lockerz/utils/shared_prefs.dart';
-import '../controllers/edit_account_controller.dart';
+import '../../controllers/edit_account_controller.dart';
 
 class EditAccountPage extends StatefulWidget {
   const EditAccountPage({super.key});

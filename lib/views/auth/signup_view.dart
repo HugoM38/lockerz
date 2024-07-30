@@ -1,23 +1,22 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lockerz/views/shared/navbar.dart';
-import '../controllers/login_controller.dart';
-import 'signup_view.dart';
+import '../../controllers/signup_controller.dart';
+import 'login_view.dart';
 
-class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+class SignupView extends StatefulWidget {
+  const SignupView({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  State<SignupView> createState() => _SignupViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
-  final LoginController _loginController = LoginController();
-  bool showOption = false;
+class _SignupViewState extends State<SignupView> {
+  final SignupController _signupController = SignupController();
 
   @override
   void dispose() {
-    _loginController.dispose();
+    _signupController.dispose();
     super.dispose();
   }
 
@@ -29,7 +28,7 @@ class _LoginViewState extends State<LoginView> {
       body: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height - kToolbarHeight, // Adjust height to account for the AppBar
+            minHeight: MediaQuery.of(context).size.height - kToolbarHeight,
           ),
           child: Center(
             child: Padding(
@@ -42,7 +41,7 @@ class _LoginViewState extends State<LoginView> {
                     children: [
                       SizedBox(
                         width: maxWidth,
-                        child: buildLoginForm(context),
+                        child: buildSignupForm(context),
                       ),
                     ],
                   );
@@ -55,7 +54,7 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget buildLoginForm(BuildContext context) {
+  Widget buildSignupForm(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -75,7 +74,7 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(height: 20),
                 Center(
                   child: Text(
-                    "Connexion",
+                    "Inscription",
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
@@ -91,18 +90,62 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                const Text("Prénom"),
+                buildFirstNameField(context),
+                const SizedBox(height: 20),
+                const Text("Nom"),
+                buildLastNameField(context),
+                const SizedBox(height: 20),
                 const Text("Email"),
                 buildEmailField(context),
                 const SizedBox(height: 20),
                 const Text("Mot de passe"),
                 buildPasswordField(context),
                 const SizedBox(height: 20),
-                buildLoginButton(context),
-                const SizedBox(height: 20),
                 buildSignupButton(context),
+                const SizedBox(height: 20),
+                buildLoginButton(context),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildFirstNameField(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+            bottom: BorderSide(color: Theme.of(context).colorScheme.primary)),
+      ),
+      child: TextFormField(
+        controller: _signupController.firstnameController,
+        style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),
+        decoration: InputDecoration(
+          suffixIcon: Icon(Icons.person,
+              color: Theme.of(context).textTheme.bodyLarge!.color),
+          fillColor: Theme.of(context).textTheme.bodyLarge!.color,
+          border: InputBorder.none,
+        ),
+      ),
+    );
+  }
+
+  Widget buildLastNameField(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+            bottom: BorderSide(color: Theme.of(context).colorScheme.primary)),
+      ),
+      child: TextFormField(
+        controller: _signupController.lastnameController,
+        style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),
+        decoration: InputDecoration(
+          suffixIcon: Icon(Icons.person,
+              color: Theme.of(context).textTheme.bodyLarge!.color),
+          fillColor: Theme.of(context).textTheme.bodyLarge!.color,
+          border: InputBorder.none,
         ),
       ),
     );
@@ -115,7 +158,7 @@ class _LoginViewState extends State<LoginView> {
             bottom: BorderSide(color: Theme.of(context).colorScheme.primary)),
       ),
       child: TextFormField(
-        controller: _loginController.emailController,
+        controller: _signupController.emailController,
         style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),
         decoration: InputDecoration(
           suffixIcon: Icon(Icons.mail,
@@ -134,7 +177,7 @@ class _LoginViewState extends State<LoginView> {
             bottom: BorderSide(color: Theme.of(context).colorScheme.primary)),
       ),
       child: TextFormField(
-        controller: _loginController.passwordController,
+        controller: _signupController.passwordController,
         style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),
         obscureText: true,
         decoration: InputDecoration(
@@ -147,7 +190,7 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget buildLoginButton(BuildContext context) {
+  Widget buildSignupButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -159,12 +202,12 @@ class _LoginViewState extends State<LoginView> {
           ),
         ),
         onPressed: () {
-          _loginController.login(context);
+          _signupController.signUp(context);
         },
         child: const Padding(
           padding: EdgeInsets.symmetric(vertical: 12),
           child: Text(
-            "Se connecter",
+            "S'inscrire",
             style: TextStyle(color: Colors.white),
           ),
         ),
@@ -172,17 +215,17 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget buildSignupButton(BuildContext context) {
+  Widget buildLoginButton(BuildContext context) {
     return Center(
       child: TextButton(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const SignupView()),
+            MaterialPageRoute(builder: (context) => const LoginView()),
           );
         },
         child: Text(
-          "Pas de compte ? Inscrivez-vous !",
+          "Vous avez déjà un compte ? Connectez-vous !",
           style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
                 shadows: [

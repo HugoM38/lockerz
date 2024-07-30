@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lockerz/views/admin/admin_home_page.dart';
 import 'package:lockerz/views/admin/administration_page.dart';
-import 'package:lockerz/views/edit_account_page.dart';
+import 'package:lockerz/views/auth/edit_account_page.dart';
 import 'package:lockerz/views/user/home_page.dart';
 import 'utils/auth_observer.dart';
-import 'views/login_view.dart';
-import 'views/signup_view.dart';
+import 'views/auth/login_view.dart';
+import 'views/auth/signup_view.dart';
 
 void main() {
   runApp(const Lockerz());

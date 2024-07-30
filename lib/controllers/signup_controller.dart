@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:lockerz/views/verification_view.dart';
+import 'package:lockerz/views/auth/verification_view.dart';
 import '../services/auth_service.dart';
 
 class SignupController {

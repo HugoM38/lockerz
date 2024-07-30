@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import '../views/verification_view.dart';
+import '../views/auth/verification_view.dart';
 
 class LoginController {
   final TextEditingController emailController = TextEditingController();

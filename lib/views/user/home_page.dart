@@ -12,10 +12,11 @@ class HomePage extends StatefulWidget {
   HomePageState createState() => HomePageState();
 }
 
-class HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   late HomePageController _controller;
   Reservation? _currentReservation;
   bool _isLoading = true;
+  late TabController _tabController;
 
   @override
   void initState() {
@@ -27,6 +28,7 @@ class HomePageState extends State<HomePage> {
   Future<void> _initializeControllers() async {
     _currentReservation = await ReservationService().getCurrentReservation();
     await _controller.initialize();
+    _tabController = TabController(length: _controller.localisations.length, vsync: this);
     setState(() {
       _isLoading = false;
     });
@@ -40,6 +42,12 @@ class HomePageState extends State<HomePage> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -231,6 +239,7 @@ class HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 10),
                   TabBar(
+                    controller: _tabController,
                     isScrollable: true,
                     tabs: _controller.localisations.map((localisation) {
                       return Tab(
@@ -245,6 +254,8 @@ class HomePageState extends State<HomePage> {
                   const SizedBox(height: 20),
                   Expanded(
                     child: TabBarView(
+                      controller: _tabController,
+                      physics: const NeverScrollableScrollPhysics(), // Disable scrolling
                       children: _controller.localisations.map((localisation) {
                         final filteredLockers = _controller.lockers
                             .where((locker) =>
@@ -253,7 +264,7 @@ class HomePageState extends State<HomePage> {
                         return ListView(
                           children: <Widget>[
                             Form(
-                              key: _controller.formKey,
+                              key: GlobalKey<FormState>(), // Ensure unique key
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[

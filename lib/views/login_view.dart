@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:lockerz/views/shared/navbar.dart';
 import '../controllers/login_controller.dart';
 import 'signup_view.dart';
 
@@ -23,11 +24,12 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const NavBar(),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height,
+            minHeight: MediaQuery.of(context).size.height - kToolbarHeight, // Adjust height to account for the AppBar
           ),
           child: Center(
             child: Padding(

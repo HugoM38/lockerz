@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lockerz/controllers/verification_controller.dart';
+import 'package:lockerz/views/shared/navbar.dart';
 
 class VerificationView extends StatefulWidget {
   final String email;
@@ -24,6 +25,7 @@ class _VerificationViewState extends State<VerificationView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const NavBar(),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SingleChildScrollView(
         child: ConstrainedBox(

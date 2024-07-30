@@ -41,7 +41,7 @@ class Lockerz extends StatelessWidget {
           bodyLarge: TextStyle(color: Colors.white),
         ),
       ),
-      initialRoute: '/login',
+      initialRoute: '/',
       navigatorObservers: [AuthObserver()],
       onGenerateRoute: (RouteSettings settings) {
         return MaterialPageRoute(
@@ -59,6 +59,8 @@ class Lockerz extends StatelessWidget {
                 }
 
                 switch (settings.name) {
+                  case '/':
+                    return const LoginView();
                   case '/login':
                     return const LoginView();
                   case '/signup':
@@ -88,7 +90,7 @@ class Lockerz extends StatelessWidget {
 
     if (isUserLogged) {
       User user = await SharedPrefs.getUser();
-      if (routeName == '/login' || routeName == '/signup') {
+      if (routeName == '/' || routeName == '/login' || routeName == '/signup') {
         if (context.mounted) {
           Navigator.pushNamedAndRemoveUntil(
               context, '/home', (Route<dynamic> route) => false);
@@ -107,10 +109,10 @@ class Lockerz extends StatelessWidget {
           return false;
         }
       }
-    } else if (routeName != '/login' && routeName != '/signup') {
+    } else if (routeName != '/' && routeName != '/login' && routeName != '/signup') {
       if (context.mounted) {
         Navigator.pushNamedAndRemoveUntil(
-            context, '/login', (Route<dynamic> route) => false);
+            context, '/', (Route<dynamic> route) => false);
         return false;
       }
     }

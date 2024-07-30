@@ -219,9 +219,9 @@ class _SignupViewState extends State<SignupView> {
     return Center(
       child: TextButton(
         onPressed: () {
-          Navigator.push(
+          Navigator.pushReplacementNamed(
             context,
-            MaterialPageRoute(builder: (context) => const LoginView()),
+            "/login",
           );
         },
         child: Text(

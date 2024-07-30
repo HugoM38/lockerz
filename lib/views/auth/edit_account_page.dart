@@ -421,10 +421,9 @@ class EditAccountPageState extends State<EditAccountPage> {
                         SharedPrefs.removeAuthToken();
                         SharedPrefs.removeUserInformation();
                         if (context.mounted) {
-                          Navigator.push(
+                          Navigator.pushReplacementNamed(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginView()));
+                              "/login");
                         }
                       }
                     },

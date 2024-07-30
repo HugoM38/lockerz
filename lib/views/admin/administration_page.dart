@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lockerz/services/reservation_service.dart';
 import 'package:lockerz/views/shared/administration_item.dart';
-import 'package:lockerz/views/admin/admin_home_page.dart'; // Import de AdminHomePage
 import '../../models/reservation_model.dart';
 import '../shared/navbar.dart';
 
@@ -82,16 +81,6 @@ class AdministrationPageState extends State<AdministrationPage> {
             ),
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AdminHomePage()),
-          );
-        },
-        tooltip: 'Accéder à la page administrateur',
-        child: const Icon(Icons.admin_panel_settings),
       ),
     );
   }

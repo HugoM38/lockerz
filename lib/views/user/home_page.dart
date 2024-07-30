@@ -30,8 +30,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     await _controller.initialize();
     if (mounted) {
       setState(() {
-        _tabController =
-            TabController(length: _controller.localisations.length, vsync: this);
+        _tabController = TabController(
+            length: _controller.localisations.length, vsync: this);
         _isLoading = false;
       });
     }
@@ -75,116 +75,121 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     final isMember = _currentReservation!.members
         .any((member) => member.id == _controller.currentUser?.id);
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: 500, // Largeur maximale de la carte
-        maxHeight: MediaQuery.of(context).size.height *
-            0.9, // Hauteur maximale ajustée
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(16), // Espaces internes
-        decoration: BoxDecoration(
-          border: Border.all(color: Theme.of(context).colorScheme.primary),
-          borderRadius: BorderRadius.circular(15), // Rayon des coins ajusté
-          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 500, // Largeur maximale de la carte
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-                sigmaY: 4, sigmaX: 4), // Intensité du flou ajustée
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Text(
-                      'Réservation actuelle',
-                      style:
-                          Theme.of(context).textTheme.headlineMedium!.copyWith(
-                        fontSize: 22, // Taille du texte
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface,
-                        shadows: [
-                          const Shadow(
-                            blurRadius: 8.0, // Intensité de l'ombre
-                            color: Colors.black,
-                            offset: Offset(1.0, 1.0),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16), // Espaces entre les éléments
-                  _buildCard('Casier', Icons.lock,
-                      '${_currentReservation!.locker.number}'),
-                  _buildCard('Localisation', Icons.location_on,
-                      _currentReservation!.locker.localisation.name),
-                  _buildCard('Propriétaire', Icons.person,
-                      '${_currentReservation!.owner.firstname} ${_currentReservation!.owner.lastname}'),
-                  const SizedBox(height: 8),
-                  Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: ListTile(
-                      leading: Icon(Icons.group,
-                          color: Theme.of(context).colorScheme.primary),
-                      title: const Text('Membres',
-                          style: TextStyle(fontSize: 16)), // Taille du texte
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _currentReservation!.members.map((member) {
-                          return Text(
-                              '${member.firstname} ${member.lastname} (${member.email})',
-                              style: const TextStyle(
-                                  fontSize: 14)); // Taille du texte
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                  _buildCard('Statut', Icons.info,
-                      _translateStatus(_currentReservation!.status)),
-                  const SizedBox(height: 16),
-                  Center(
-                    child: Column(
-                      children: [
-                        if (isMember) ...[
-                          ElevatedButton(
-                            onPressed: () async {
-                              await _controller.retireFromLocker(context);
-                              if (mounted) {
-                                await _initializeControllers();
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.red, // Couleur du bouton
+        child: Container(
+          padding: const EdgeInsets.all(16), // Espaces internes
+          decoration: BoxDecoration(
+            border: Border.all(color: Theme.of(context).colorScheme.primary),
+            borderRadius: BorderRadius.circular(15), // Rayon des coins ajusté
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                  sigmaY: 4, sigmaX: 4), // Intensité du flou ajustée
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Center(
+                      child: Text(
+                        'Réservation actuelle',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium!
+                            .copyWith(
+                          fontSize: 22, // Taille du texte
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          shadows: [
+                            const Shadow(
+                              blurRadius: 8.0, // Intensité de l'ombre
+                              color: Colors.black,
+                              offset: Offset(1.0, 1.0),
                             ),
-                            child: const Text('Se retirer du casier'),
-                          ),
-                        ] else if (isOwner) ...[
-                          ...[
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16), // Espaces entre les éléments
+                    _buildCard('Casier', Icons.lock,
+                        '${_currentReservation!.locker.number}'),
+                    _buildCard('Localisation', Icons.location_on,
+                        _currentReservation!.locker.localisation.name),
+                    _buildCard('Propriétaire', Icons.person,
+                        '${_currentReservation!.owner.firstname} ${_currentReservation!.owner.lastname}'),
+                    const SizedBox(height: 8),
+                    Card(
+                      margin: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: ListTile(
+                        leading: Icon(Icons.group,
+                            color: Theme.of(context).colorScheme.primary),
+                        title: const Text('Membres',
+                            style: TextStyle(fontSize: 16)), // Taille du texte
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _currentReservation!.members.map((member) {
+                            return Text(
+                                '${member.firstname} ${member.lastname} (${member.email})',
+                                style: const TextStyle(
+                                    fontSize: 14)); // Taille du texte
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                    _buildCard('Statut', Icons.info,
+                        _translateStatus(_currentReservation!.status)),
+                    const SizedBox(height: 16),
+                    Center(
+                      child: Column(
+                        children: [
+                          if (isMember) ...[
                             ElevatedButton(
                               onPressed: () async {
-                                await _controller.terminateReservation(context);
+                                await _controller.retireFromLocker(context);
                                 if (mounted) {
                                   await _initializeControllers();
                                 }
                               },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.white,
-                                backgroundColor: Colors.red,
+                                backgroundColor:
+                                    Colors.red, // Couleur du bouton
                               ),
-                              child: Text(isPending
-                                  ? 'Annuler la réservation'
-                                  : 'Terminer la réservation'),
+                              child: const Text('Se retirer du casier'),
                             ),
+                          ] else if (isOwner) ...[
+                            ...[
+                              ElevatedButton(
+                                onPressed: () async {
+                                  await _controller
+                                      .terminateReservation(context);
+                                  if (mounted) {
+                                    await _initializeControllers();
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: Colors.red,
+                                ),
+                                child: Text(isPending
+                                    ? 'Annuler la réservation'
+                                    : 'Terminer la réservation'),
+                              ),
+                            ],
                           ],
                         ],
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -255,8 +260,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             return Tab(
                               text: localisation.name,
                               icon: localisation.accessibility
-                                  ? const Icon(
-                                      Icons.wheelchair_pickup) // Icône de handicap
+                                  ? const Icon(Icons
+                                      .wheelchair_pickup) // Icône de handicap
                                   : const Icon(Icons.accessibility),
                             );
                           }).toList(),
@@ -269,22 +274,27 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             controller: _tabController,
                             physics:
                                 const NeverScrollableScrollPhysics(), // Disable scrolling
-                            children: _controller.localisations.map((localisation) {
+                            children:
+                                _controller.localisations.map((localisation) {
                               final filteredLockers = _controller.lockers
                                   .where((locker) =>
-                                      locker.localisation.name == localisation.name)
+                                      locker.localisation.name ==
+                                      localisation.name)
                                   .toList();
                               return ListView(
                                 children: <Widget>[
                                   Form(
                                     key: _controller.formKey,
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: <Widget>[
                                         Wrap(
                                           spacing: 8.0, // Espacement horizontal
-                                          runSpacing: 8.0, // Espacement vertical
-                                          children: filteredLockers.map((locker) {
+                                          runSpacing:
+                                              8.0, // Espacement vertical
+                                          children:
+                                              filteredLockers.map((locker) {
                                             final isAvailable =
                                                 locker.status == 'available';
                                             final isSelected =
@@ -295,7 +305,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                               onTap: isAvailable
                                                   ? () {
                                                       setState(() {
-                                                        _controller.selectedLockerId =
+                                                        _controller
+                                                                .selectedLockerId =
                                                             locker.id;
                                                       });
                                                     }
@@ -308,7 +319,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                       ? Colors.green
                                                       : Colors.grey,
                                                   borderRadius:
-                                                      BorderRadius.circular(8.0),
+                                                      BorderRadius.circular(
+                                                          8.0),
                                                   border: Border.all(
                                                     color: isSelected
                                                         ? Colors.red
@@ -321,7 +333,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                     '${locker.number}',
                                                     style: const TextStyle(
                                                       fontSize: 18,
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                       color: Colors.white,
                                                     ),
                                                   ),
@@ -340,12 +353,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         const SizedBox(height: 10),
                                         TextField(
                                           decoration: const InputDecoration(
-                                            labelText: 'Rechercher un utilisateur',
+                                            labelText:
+                                                'Rechercher un utilisateur',
                                             border: OutlineInputBorder(),
                                           ),
                                           onChanged: (query) {
                                             setState(() {
-                                              _controller.updateSearchQuery(query);
+                                              _controller
+                                                  .updateSearchQuery(query);
                                             });
                                           },
                                         ),
@@ -353,24 +368,27 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         SizedBox(
                                           height: 200,
                                           child: ListView(
-                                            children:
-                                                _controller.filteredUsers.map((user) {
+                                            children: _controller.filteredUsers
+                                                .map((user) {
                                               final isSelected = _controller
                                                   .selectedUsers
                                                   .contains(user);
                                               return CheckboxListTile(
-                                                key: Key(user.id), // Add a key to identify the user
+                                                key: Key(user
+                                                    .id), // Add a key to identify the user
                                                 title: Text(
                                                     '${user.firstname} ${user.lastname} (${user.email})'),
                                                 value: isSelected,
-                                                onChanged: _controller.selectedUsers
+                                                onChanged: _controller
+                                                                .selectedUsers
                                                                 .length <
                                                             4 ||
                                                         isSelected
                                                     ? (value) async {
                                                         setState(() {
-                                                          _controller.onUserSelected(
-                                                              user, value!);
+                                                          _controller
+                                                              .onUserSelected(
+                                                                  user, value!);
                                                         });
                                                       }
                                                     : null,
@@ -385,7 +403,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                               value: _controller.termsAccepted,
                                               onChanged: (bool? value) {
                                                 setState(() {
-                                                  _controller.termsAccepted = value!;
+                                                  _controller.termsAccepted =
+                                                      value!;
                                                 });
                                               },
                                             ),
@@ -398,8 +417,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                   style: TextStyle(
                                                     decoration: TextDecoration
                                                         .underline, // Souligner le texte
-                                                    color:
-                                                        Colors.blue, // Couleur du texte
+                                                    color: Colors
+                                                        .blue, // Couleur du texte
                                                   ),
                                                 ),
                                               ),
@@ -410,8 +429,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         ElevatedButton(
                                           onPressed: _controller.termsAccepted
                                               ? () async {
-                                                  final result = await _controller
-                                                      .submitForm(context);
+                                                  final result =
+                                                      await _controller
+                                                          .submitForm(context);
                                                   if (result) {
                                                     await _initializeControllers();
                                                   }
@@ -419,8 +439,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                               : null,
                                           style: ElevatedButton.styleFrom(
                                             foregroundColor: Colors.white,
-                                            backgroundColor:
-                                                Colors.green, // Couleur du bouton
+                                            backgroundColor: Colors
+                                                .green, // Couleur du bouton
                                           ),
                                           child: const Text('Réserver'),
                                         ),
@@ -478,7 +498,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       const SizedBox(height: 16),
                       const Text(
                         "Cadenas à clés : ",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const Text(
                           "Obligation de déposer un double de la clé à l'accueil.",
@@ -486,7 +507,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       const SizedBox(height: 8),
                       const Text(
                         "Cadenas à code : ",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const Text(
                           "Le code doit être partagé avec les membres de l'équipe et l'accueil.",

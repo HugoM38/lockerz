@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lockerz/views/shared/navbar.dart';
 import '../../controllers/login_controller.dart';
 import 'signup_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -14,6 +15,13 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   final LoginController _loginController = LoginController();
   bool showOption = false;
+  bool _showCookiePopup = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfAcceptedCookies();
+  }
 
   @override
   void dispose() {
@@ -21,36 +29,66 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
+  Future<void> _checkIfAcceptedCookies() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? accepted = prefs.getBool('cookies_accepted');
+    if (accepted != null && accepted) {
+      setState(() {
+        _showCookiePopup = false;
+      });
+    }
+  }
+
+  Future<void> _acceptCookies() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('cookies_accepted', true);
+    setState(() {
+      _showCookiePopup = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const NavBar(),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height - kToolbarHeight, // Adjust height to account for the AppBar
-          ),
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) {
-                  double maxWidth = constraints.maxWidth < 400 ? constraints.maxWidth : 400;
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: maxWidth,
-                        child: buildLoginForm(context),
-                      ),
-                    ],
-                  );
-                },
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height - kToolbarHeight, // Adjust height to account for the AppBar
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: LayoutBuilder(
+                    builder: (BuildContext context, BoxConstraints constraints) {
+                      double maxWidth = constraints.maxWidth < 400 ? constraints.maxWidth : 400;
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: maxWidth,
+                            child: buildLoginForm(context),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ),
-        ),
+          if (_showCookiePopup)
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(
+                color: Colors.black.withOpacity(0.5),
+              ),
+            ),
+          if (_showCookiePopup) _buildCookiePopup(context),
+        ],
       ),
     );
   }
@@ -193,6 +231,61 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ],
               ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCookiePopup(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border.all(color: Theme.of(context).colorScheme.primary),
+              borderRadius: BorderRadius.circular(15),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            ),
+            child: SizedBox(
+              width: 300,
+              height: 200,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.cookie,
+                    size: 50,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Ce site utilise des cookies essentiels pour garantir son bon fonctionnement et améliorer votre expérience. Nous respectons votre vie privée et ne partageons aucune donnée personnelle.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,  // Taille de texte plus petite
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _acceptCookies,
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: const Text('Accepter'),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

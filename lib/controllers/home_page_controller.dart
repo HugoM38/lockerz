@@ -21,6 +21,7 @@ class HomePageController {
   List<Localisation> localisations = [];
   User? currentUser;
   Reservation? currentReservation;
+  bool get isAnyUserSelected => selectedUsers.isNotEmpty;
 
   Future<void> initialize() async {
     currentUser = await SharedPrefs.getUser();
@@ -59,35 +60,42 @@ class HomePageController {
   }
 
   Future<void> submitForm(BuildContext context) async {
-    if (formKey.currentState?.validate() ?? false) {
-      if (selectedLockerId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Veuillez sélectionner un casier.')),
-        );
-        return;
-      }
-      if (!termsAccepted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Veuillez accepter les termes d\'utilisation.')),
-        );
-        return;
-      }
-
-      final result = await ReservationService().createReservation(
-        selectedLockerId!,
-        selectedUsers.map((u) => u.id).toList(),
-      );
-
+  if (formKey.currentState?.validate() ?? false) {
+    if (selectedLockerId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result
-              ? 'Formulaire soumis avec succès!'
-              : 'Erreur de création de réservation'),
-        ),
+        const SnackBar(content: Text('Veuillez sélectionner un casier.')),
       );
+      return;
     }
+    if (!termsAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Veuillez accepter les termes d\'utilisation.')),
+      );
+      return;
+    }
+    if (!isAnyUserSelected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez sélectionner au moins un utilisateur.')),
+      );
+      return;
+    }
+
+    final result = await ReservationService().createReservation(
+      selectedLockerId!,
+      selectedUsers.map((u) => u.id).toList(),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(result
+            ? 'Formulaire soumis avec succès!'
+            : 'Erreur de création de réservation'),
+      ),
+    );
   }
+}
+
 
   Future<void> terminateReservation(BuildContext context) async {
     if (currentReservation != null) {

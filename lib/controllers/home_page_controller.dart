@@ -61,47 +61,52 @@ class HomePageController {
   }
 
   Future<bool> submitForm(BuildContext context) async {
-  if (formKey.currentState?.validate() ?? false) {
-    if (selectedLockerId == null) {
-      showCustomSnackBar(context, 'Veuillez sélectionner un casier.');
-      return false;
-    }
-    if (!termsAccepted) {
-      showCustomSnackBar(context, 'Veuillez accepter les termes d\'utilisation.');
-      return false;
-    }
-    if (!isAnyUserSelected) {
-      showCustomSnackBar(context, 'Veuillez sélectionner au moins un utilisateur.');
-      return false;
-    }
+    if (formKey.currentState?.validate() ?? false) {
+      if (selectedLockerId == null) {
+        showCustomSnackBar(context, 'Veuillez sélectionner un casier.');
+        return false;
+      }
+      if (!termsAccepted) {
+        showCustomSnackBar(context, 'Veuillez accepter les termes d\'utilisation.');
+        return false;
+      }
+      if (!isAnyUserSelected) {
+        showCustomSnackBar(context, 'Veuillez sélectionner au moins un utilisateur.');
+        return false;
+      }
 
-    final result = await ReservationService().createReservation(
-      selectedLockerId!,
-      selectedUsers.map((u) => u.id).toList(),
-    );
+      final result = await ReservationService().createReservation(
+        selectedLockerId!,
+        selectedUsers.map((u) => u.id).toList(),
+      );
 
-    if (context.mounted) {
-      showCustomSnackBar(context,result
-              ? 'Formulaire soumis avec succès!'
-              : 'Erreur lors de la création de la réservation');
+      if (context.mounted) {
+        showCustomSnackBar(context, result
+                ? 'Formulaire soumis avec succès!'
+                : 'Erreur lors de la création de la réservation');
+      }
+      if (result) {
+        resetForm();
+      }
+      return result;
     }
-    return result;
+    return false;
   }
-  return false;
-}
 
   Future<void> terminateReservation(BuildContext context) async {
-  if (currentReservation != null) {
-    final result = await ReservationService()
-        .terminateReservation(currentReservation!.id);
-    showCustomSnackBar(context,result
-            ? 'Réservation terminée avec succès!'
-            : 'Erreur de lors de la terminaison de votre réservation');
-  } else {
-    showCustomSnackBar(context, 'Aucune réservation en cours.');
+    if (currentReservation != null) {
+      final result = await ReservationService()
+          .terminateReservation(currentReservation!.id);
+      showCustomSnackBar(context, result
+              ? 'Réservation terminée avec succès!'
+              : 'Erreur de lors de la terminaison de votre réservation');
+      if (result) {
+        resetForm();
+      }
+    } else {
+      showCustomSnackBar(context, 'Aucune réservation en cours.');
+    }
   }
-}
-
 
   Future<void> cancelReservation(BuildContext context) async {
     if (currentReservation != null) {
@@ -112,6 +117,9 @@ class HomePageController {
                 ? 'Réservation annulée avec succès!'
                 : 'Erreur lors de l\'annulation de votre réservation');
       }
+      if (result) {
+        resetForm();
+      }
     }
   }
 
@@ -120,10 +128,20 @@ class HomePageController {
       final result =
           await ReservationService().leaveReservation(currentReservation!.id);
       if (context.mounted) {
-        showCustomSnackBar(context,result
+        showCustomSnackBar(context, result
                 ? 'Vous vous êtes retiré du casier avec succès!'
                 : 'Erreur de lors du votre retrait du casier');
       }
+      if (result) {
+        resetForm();
+      }
     }
+  }
+
+  void resetForm() {
+    selectedLockerId = null;
+    selectedUsers.clear();
+    termsAccepted = false;
+    currentReservation = null;
   }
 }

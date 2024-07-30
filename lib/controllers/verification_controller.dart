@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lockerz/services/auth_service.dart';
 
+import '../views/shared/snackbar.dart';
+
 class VerificationController {
   final TextEditingController codeController = TextEditingController();
   final AuthService _authService = AuthService();
@@ -14,9 +16,7 @@ class VerificationController {
     final code = codeController.text;
 
     if (code.isEmpty || code.length != 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez saisir un code de 6 chiffres')),
-      );
+      showCustomSnackBar(context, 'Veuillez saisir un code de 6 chiffres');
       return;
     }
 
@@ -27,22 +27,15 @@ class VerificationController {
 
       if (context.mounted) {
         if (response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Vérification réussie')),
-          );
+          showCustomSnackBar(context, 'Vérification réussie');
           Navigator.of(context).pushReplacementNamed('/home');
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Code incorrect')),
-          );
+          showCustomSnackBar(context, 'Code incorrect');
         }
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Une erreur est survenue lors de la vérification')),
-        );
+        showCustomSnackBar(context, 'Une erreur est survenue lors de la vérification');
       }
     } finally {
       isLoading.value = false;
@@ -56,18 +49,11 @@ class VerificationController {
     try {
       await _authService.sendCode(email);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Code renvoyé. Veuillez vérifier votre email.')),
-        );
+        showCustomSnackBar(context, 'Code renvoyé. Veuillez vérifier votre email.');
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content:
-                  Text('Une erreur est survenue lors de l\'envoi du code')),
-        );
+        showCustomSnackBar(context, 'Une erreur est survenue lors de l\'envoi du code');
       }
     }
 

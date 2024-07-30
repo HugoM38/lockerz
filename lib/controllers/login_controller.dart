@@ -17,7 +17,7 @@ class LoginController {
     final password = passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      showCustomSnackBar(context, 'Veuillez remplir tous les champs.');
+      showCustomSnackBar(context, 'Veuillez remplir tous les champs');
       return;
     }
 
@@ -52,7 +52,7 @@ class LoginController {
             }
           }
         } else if (response.statusCode == 403) {
-          showCustomSnackBar(context, 'Email non vérifié. Veuillez vérifier votre email.');
+          showCustomSnackBar(context, 'Email non vérifié. Veuillez vérifier votre email');
           await _authService.sendCode(email);
           if (context.mounted) {
             Navigator.of(context).pushReplacement(MaterialPageRoute(

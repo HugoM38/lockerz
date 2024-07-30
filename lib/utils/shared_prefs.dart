@@ -11,7 +11,6 @@ class SharedPrefs {
   static Future<void> saveAuthToken(String token) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(_authTokenKey, token);
-    Fluttertoast.showToast(msg: "Token enregistré dans SharedPreferences");
   }
 
   static Future<String?> getAuthToken() async {

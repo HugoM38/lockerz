@@ -210,7 +210,8 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                       Container(
                         padding: const EdgeInsets.all(8),
                         constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(context).size.height * 0.6,
+                          maxHeight: MediaQuery.of(context).size.height * 0.4,
+                          maxWidth: MediaQuery.of(context).size.width * 0.5,
                         ),
                         child: SingleChildScrollView(
                           child: Column(
@@ -232,7 +233,13 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                                     ),
                                     child: ExpansionTile(
                                       title: Text('${reservation.owner.firstname} ${reservation.owner.lastname} (${reservation.owner.email})'),
-                                      trailing: Text(_translateStatus(reservation.status)),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(_translateStatus(reservation.status)),
+                                          const Icon(Icons.arrow_drop_down),
+                                        ],
+                                      ),
                                       children: reservation.members.map((member) {
                                         return ListTile(
                                           title: Text('${member.firstname} ${member.lastname} (${member.email})'),

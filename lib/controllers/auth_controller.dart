@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../views/shared/snackbar.dart';
 
 class AuthController {
   final AuthService _authService = AuthService();
@@ -7,9 +8,7 @@ class AuthController {
   Future<void> logout(BuildContext context) async {
     await _authService.logout();
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Déconnexion réussie')),
-      );
+      showCustomSnackBar(context, 'Déconnexion réussie');
     }
     if (context.mounted) {
       await Navigator.of(context).pushReplacementNamed('/login');

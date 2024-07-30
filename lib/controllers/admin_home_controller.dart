@@ -4,6 +4,7 @@ import 'package:lockerz/services/localisation_service.dart';
 import 'package:lockerz/services/locker_service.dart';
 import 'package:lockerz/services/reservation_service.dart';
 import '../../models/locker_model.dart';
+import '../views/shared/snackbar.dart';
 
 class AdminHomePageController {
   List<Locker> lockers = [];
@@ -20,12 +21,7 @@ class AdminHomePageController {
       BuildContext context, String reservationId) async {
     final result =
         await ReservationService().terminateReservation(reservationId);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(result
-            ? 'Réservation terminée avec succès!'
-            : 'Erreur de terminaison de réservation'),
-      ),
-    );
+    showCustomSnackBar(context, result ? 'Réservation terminée avec succès'
+        : 'Erreur lors de la terminaison de la réservation');
   }
 }

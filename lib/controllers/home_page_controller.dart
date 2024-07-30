@@ -8,6 +8,7 @@ import 'package:lockerz/services/reservation_service.dart';
 import 'package:lockerz/utils/shared_prefs.dart';
 import '../../models/locker_model.dart';
 import '../../models/reservation_model.dart';
+import '../views/shared/snackbar.dart';
 
 class HomePageController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -62,23 +63,15 @@ class HomePageController {
   Future<bool> submitForm(BuildContext context) async {
   if (formKey.currentState?.validate() ?? false) {
     if (selectedLockerId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez sélectionner un casier.')),
-      );
+      showCustomSnackBar(context, 'Veuillez sélectionner un casier.');
       return false;
     }
     if (!termsAccepted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Veuillez accepter les termes d\'utilisation.')),
-      );
+      showCustomSnackBar(context, 'Veuillez accepter les termes d\'utilisation.');
       return false;
     }
     if (!isAnyUserSelected) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Veuillez sélectionner au moins un utilisateur.')),
-      );
+      showCustomSnackBar(context, 'Veuillez sélectionner au moins un utilisateur.');
       return false;
     }
 
@@ -88,13 +81,9 @@ class HomePageController {
     );
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result
+      showCustomSnackBar(context,result
               ? 'Formulaire soumis avec succès!'
-              : 'Erreur de création de réservation'),
-        ),
-      );
+              : 'Erreur lors de la création de la réservation');
     }
     return result;
   }
@@ -105,19 +94,11 @@ class HomePageController {
   if (currentReservation != null) {
     final result = await ReservationService()
         .terminateReservation(currentReservation!.id);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(result
+    showCustomSnackBar(context,result
             ? 'Réservation terminée avec succès!'
-            : 'Erreur de terminaison de réservation'),
-      ),
-    );
+            : 'Erreur de lors de la terminaison de votre réservation');
   } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Aucune réservation en cours.'),
-      ),
-    );
+    showCustomSnackBar(context, 'Aucune réservation en cours.');
   }
 }
 
@@ -127,13 +108,9 @@ class HomePageController {
       final result = await ReservationService()
           .terminateReservation(currentReservation!.id);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result
+        showCustomSnackBar(context, result
                 ? 'Réservation annulée avec succès!'
-                : 'Erreur d\'annulation de réservation'),
-          ),
-        );
+                : 'Erreur lors de l\'annulation de votre réservation');
       }
     }
   }
@@ -143,13 +120,9 @@ class HomePageController {
       final result =
           await ReservationService().leaveReservation(currentReservation!.id);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result
+        showCustomSnackBar(context,result
                 ? 'Vous vous êtes retiré du casier avec succès!'
-                : 'Erreur de retrait du casier'),
-          ),
-        );
+                : 'Erreur de lors du votre retrait du casier');
       }
     }
   }

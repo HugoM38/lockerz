@@ -6,6 +6,8 @@ import 'package:lockerz/services/reservation_service.dart';
 import 'package:lockerz/models/reservation_model.dart';
 import 'package:lockerz/services/locker_service.dart';
 
+import '../shared/snackbar.dart';
+
 class AdminHomePage extends StatefulWidget {
   const AdminHomePage({super.key});
 
@@ -149,9 +151,7 @@ class AdminHomePageState extends State<AdminHomePage>
       BuildContext context, String number, String localisationId) async {
     final int lockerNumber = int.tryParse(number) ?? -1;
     if (lockerNumber == -1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Veuillez entrer un numéro de casier valide')),
-      );
+      showCustomSnackBar(context, 'Veuillez entrer un numéro de casier valide');
       return;
     }
 
@@ -166,15 +166,11 @@ class AdminHomePageState extends State<AdminHomePage>
     final success = await _lockerService.createLocker(lockerData);
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Casier ajouté avec succès')),
-      );
+      showCustomSnackBar(context, 'Casier ajouté avec succès');
       Navigator.of(context).pop();
       await _initializeControllers(); // Rafraîchir les données après ajout
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de l\'ajout du casier')),
-      );
+      showCustomSnackBar(context, 'Erreur lors de l\'ajout du casier');
     }
   }
 

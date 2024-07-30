@@ -59,45 +59,48 @@ class HomePageController {
     }
   }
 
-  Future<void> submitForm(BuildContext context) async {
-    if (formKey.currentState?.validate() ?? false) {
-      if (selectedLockerId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Veuillez sélectionner un casier.')),
-        );
-        return;
-      }
-      if (!termsAccepted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Veuillez accepter les termes d\'utilisation.')),
-        );
-        return;
-      }
-      if (!isAnyUserSelected) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Veuillez sélectionner au moins un utilisateur.')),
-        );
-        return;
-      }
-
-      final result = await ReservationService().createReservation(
-        selectedLockerId!,
-        selectedUsers.map((u) => u.id).toList(),
+  Future<bool> submitForm(BuildContext context) async {
+  if (formKey.currentState?.validate() ?? false) {
+    if (selectedLockerId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez sélectionner un casier.')),
       );
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result
-                ? 'Formulaire soumis avec succès!'
-                : 'Erreur de création de réservation'),
-          ),
-        );
-      }
+      return false;
     }
+    if (!termsAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Veuillez accepter les termes d\'utilisation.')),
+      );
+      return false;
+    }
+    if (!isAnyUserSelected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Veuillez sélectionner au moins un utilisateur.')),
+      );
+      return false;
+    }
+
+    final result = await ReservationService().createReservation(
+      selectedLockerId!,
+      selectedUsers.map((u) => u.id).toList(),
+    );
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result
+              ? 'Formulaire soumis avec succès!'
+              : 'Erreur de création de réservation'),
+        ),
+      );
+    }
+    return result;
   }
+  return false;
+}
+
 
   Future<void> terminateReservation(BuildContext context) async {
     if (currentReservation != null) {

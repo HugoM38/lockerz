@@ -349,6 +349,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             .selectedUsers
                                             .contains(user);
                                         return CheckboxListTile(
+                                          key: Key(user.id), // Add a key to identify the user
                                           title: Text(
                                               '${user.firstname} ${user.lastname} (${user.email})'),
                                           value: isSelected,
@@ -356,7 +357,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                           .length <
                                                       4 ||
                                                   isSelected
-                                              ? (value) {
+                                              ? (value) async {
                                                   setState(() {
                                                     _controller.onUserSelected(
                                                         user, value!);
@@ -399,9 +400,11 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   ElevatedButton(
                                     onPressed: _controller.termsAccepted
                                         ? () async {
-                                            await _controller
+                                            final result = await _controller
                                                 .submitForm(context);
-                                            await _initializeControllers();
+                                            if (result) {
+                                              await _initializeControllers();
+                                            }
                                           }
                                         : null,
                                     style: ElevatedButton.styleFrom(

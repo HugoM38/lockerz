@@ -5,6 +5,7 @@ import 'package:lockerz/models/user_model.dart';
 import 'package:lockerz/utils/shared_prefs.dart';
 import '../services/auth_service.dart';
 import '../views/auth/verification_view.dart';
+import '../views/shared/snackbar.dart';
 
 class LoginController {
   final TextEditingController emailController = TextEditingController();
@@ -16,34 +17,22 @@ class LoginController {
     final password = passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez remplir tous les champs')),
-      );
+      showCustomSnackBar(context, 'Veuillez remplir tous les champs.');
       return;
     }
 
     if (!email.contains('@')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez saisir un email valide')),
-      );
+      showCustomSnackBar(context, 'Veuillez saisir un email valide');
       return;
     }
 
     if (RegExp(r'^(?=.*[A-Z])(?=.*\d).{8,}$').hasMatch(password) == false) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre')),
-      );
+      showCustomSnackBar(context, 'Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre');
       return;
     }
 
     if (!email.endsWith("@myges.fr")) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Veuillez saisir un email de l\'école finissant par "myges.fr"')),
-      );
+      showCustomSnackBar(context, 'Veuillez saisir un email de l\'école finissant par "myges.fr"');
       return;
     }
 
@@ -52,9 +41,7 @@ class LoginController {
 
       if (context.mounted) {
         if (response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Connexion réussie')),
-          );
+          showCustomSnackBar(context, 'Connexion réussie');
 
           User user = await SharedPrefs.getUser();
           if (context.mounted) {
@@ -65,11 +52,7 @@ class LoginController {
             }
           }
         } else if (response.statusCode == 403) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content:
-                    Text('Email non vérifié. Veuillez vérifier votre email.')),
-          );
+          showCustomSnackBar(context, 'Email non vérifié. Veuillez vérifier votre email.');
           await _authService.sendCode(email);
           if (context.mounted) {
             Navigator.of(context).pushReplacement(MaterialPageRoute(
@@ -78,17 +61,12 @@ class LoginController {
                     )));
           }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(jsonDecode(response.body)["error"])),
-          );
+          showCustomSnackBar(context, jsonDecode(response.body)["error"]);
         }
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Une erreur est survenue lors de la connexion')),
-        );
+        showCustomSnackBar(context, 'Une erreur est survenue lors de la connexion');
       }
     }
   }

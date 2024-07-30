@@ -15,7 +15,8 @@ class AdminHomePage extends StatefulWidget {
   AdminHomePageState createState() => AdminHomePageState();
 }
 
-class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMixin {
+class AdminHomePageState extends State<AdminHomePage>
+    with TickerProviderStateMixin {
   late AdminHomePageController _controller;
   bool _isLoading = true;
   TabController? _tabController;
@@ -32,7 +33,8 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
     await _controller.initialize();
     if (mounted) {
       setState(() {
-        _tabController = TabController(length: _controller.localisations.length, vsync: this);
+        _tabController = TabController(
+            length: _controller.localisations.length, vsync: this);
         _isLoading = false;
       });
     }
@@ -69,6 +71,9 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
 
   void _showAddLockerPopup(BuildContext context, String localisationId) {
     TextEditingController _numberController = TextEditingController();
+    double popupWidth = MediaQuery.of(context).size.width > 600
+        ? MediaQuery.of(context).size.width * 0.5
+        : MediaQuery.of(context).size.width * 0.9;
 
     showDialog(
       context: context,
@@ -84,13 +89,14 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).colorScheme.primary),
+                  border:
+                      Border.all(color: Theme.of(context).colorScheme.primary),
                   borderRadius: BorderRadius.circular(15),
                   color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.5,
+                    maxWidth: popupWidth,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -98,13 +104,14 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                       const Center(
                         child: Text(
                           'Ajouter un nouveau casier',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 16),
                       TextField(
                         controller: _numberController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Numéro du casier',
                           border: OutlineInputBorder(),
                         ),
@@ -115,10 +122,12 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                         children: [
                           ElevatedButton(
                             onPressed: () {
-                              _createLocker(context, _numberController.text, localisationId);
+                              _createLocker(context, _numberController.text,
+                                  localisationId);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.secondary,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.secondary,
                               foregroundColor: Colors.white,
                             ),
                             child: const Text('Ajouter'),
@@ -142,7 +151,8 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
     );
   }
 
-  Future<void> _createLocker(BuildContext context, String number, String localisationId) async {
+  Future<void> _createLocker(
+      BuildContext context, String number, String localisationId) async {
     final int lockerNumber = int.tryParse(number) ?? -1;
     if (lockerNumber == -1) {
       showCustomSnackBar(context, 'Veuillez entrer un numéro de casier valide');
@@ -154,7 +164,8 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
       'localisation': localisationId,
     };
 
-    print('Données envoyées : $lockerData'); // Afficher les données dans la console
+    print(
+        'Données envoyées : $lockerData'); // Afficher les données dans la console
 
     final success = await _lockerService.createLocker(lockerData);
 
@@ -217,32 +228,43 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                         : TabBarView(
                             controller: _tabController,
                             physics: const NeverScrollableScrollPhysics(),
-                            children: _controller.localisations.map((localisation) {
+                            children:
+                                _controller.localisations.map((localisation) {
                               final filteredLockers = _controller.lockers
-                                  .where((locker) => locker.localisation.name == localisation.name)
+                                  .where((locker) =>
+                                      locker.localisation.name ==
+                                      localisation.name)
                                   .toList();
                               return ListView(
                                 children: <Widget>[
                                   Form(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: <Widget>[
                                         Wrap(
                                           spacing: 8.0, // Espacement horizontal
-                                          runSpacing: 8.0, // Espacement vertical
+                                          runSpacing:
+                                              8.0, // Espacement vertical
                                           children: [
                                             ...filteredLockers.map((locker) {
-                                              final isAvailable = locker.status == 'available';
+                                              final isAvailable =
+                                                  locker.status == 'available';
                                               return GestureDetector(
                                                 onTap: () {
-                                                  _showLockerHistory(context, locker.id, isAvailable);
+                                                  _showLockerHistory(context,
+                                                      locker.id, isAvailable);
                                                 },
                                                 child: Container(
                                                   width: 48.0,
                                                   height: 48.0,
                                                   decoration: BoxDecoration(
-                                                    color: isAvailable ? Colors.green : Colors.grey,
-                                                    borderRadius: BorderRadius.circular(8.0),
+                                                    color: isAvailable
+                                                        ? Colors.green
+                                                        : Colors.grey,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
                                                     border: Border.all(
                                                       color: Colors.black,
                                                       width: 2.0,
@@ -253,7 +275,8 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                                                       '${locker.number}',
                                                       style: const TextStyle(
                                                         fontSize: 18,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         color: Colors.white,
                                                       ),
                                                     ),
@@ -263,14 +286,17 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                                             }).toList(),
                                             GestureDetector(
                                               onTap: () {
-                                                _showAddLockerPopup(context, localisation.id);
+                                                _showAddLockerPopup(
+                                                    context, localisation.id);
                                               },
                                               child: Container(
                                                 width: 48.0,
                                                 height: 48.0,
                                                 decoration: BoxDecoration(
                                                   color: Colors.blue,
-                                                  borderRadius: BorderRadius.circular(8.0),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.0),
                                                   border: Border.all(
                                                     color: Colors.black,
                                                     width: 2.0,
@@ -304,8 +330,14 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
     );
   }
 
-  void _showLockerHistory(BuildContext context, String lockerId, bool isAvailable) async {
-    List<Reservation> history = await ReservationService().getLockerHistory(lockerId);
+  void _showLockerHistory(
+      BuildContext context, String lockerId, bool isAvailable) async {
+    List<Reservation> history =
+        await ReservationService().getLockerHistory(lockerId);
+    double popupWidth = MediaQuery.of(context).size.width > 600
+        ? MediaQuery.of(context).size.width * 0.6
+        : MediaQuery.of(context).size.width * 0.9;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -320,13 +352,14 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).colorScheme.primary),
+                  border:
+                      Border.all(color: Theme.of(context).colorScheme.primary),
                   borderRadius: BorderRadius.circular(15),
                   color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.6,
+                    maxWidth: popupWidth,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -334,15 +367,16 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                       const Center(
                         child: Text(
                           'Réservations du casier',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 16),
                       Container(
                         padding: const EdgeInsets.all(8),
                         constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(context).size.height * 0.4,
-                          maxWidth: MediaQuery.of(context).size.width * 0.5,
+                          maxHeight: MediaQuery.of(context).size.height * 0.6,
+                          maxWidth: MediaQuery.of(context).size.width * 0.8,
                         ),
                         child: SingleChildScrollView(
                           child: Column(
@@ -358,24 +392,45 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                                     margin: const EdgeInsets.only(bottom: 8),
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      border: Border.all(color: Theme.of(context).colorScheme.primary),
+                                      border: Border.all(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary),
                                       borderRadius: BorderRadius.circular(15),
-                                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withOpacity(0.1),
                                     ),
-                                    child: ExpansionTile(
-                                      title: Text('${reservation.owner.firstname} ${reservation.owner.lastname} (${reservation.owner.email})'),
-                                      trailing: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(_translateStatus(reservation.status)),
-                                          const Icon(Icons.arrow_drop_down),
-                                        ],
-                                      ),
-                                      children: reservation.members.map((member) {
-                                        return ListTile(
-                                          title: Text('${member.firstname} ${member.lastname} (${member.email})'),
-                                        );
-                                      }).toList(),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              '${reservation.owner.firstname} ${reservation.owner.lastname}',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(_translateStatus(
+                                                reservation.status)),
+                                          ],
+                                        ),
+                                        Text(reservation.owner.email),
+                                        ExpansionTile(
+                                          title: const SizedBox.shrink(),
+                                          children:
+                                              reservation.members.map((member) {
+                                            return ListTile(
+                                              title: Text(
+                                                  '${member.firstname} ${member.lastname} (${member.email})'),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
                                     ),
                                   );
                                 },
@@ -384,14 +439,15 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                           ),
                         ),
                       ),
-                      if (!isAvailable && history.isNotEmpty)
+                      if (!isAvailable && history.isNotEmpty && (history.last.status == 'accepted' || history.last.status == 'pending') )
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Padding(
                             padding: const EdgeInsets.only(top: 16.0),
                             child: ElevatedButton(
                               onPressed: () async {
-                                await _controller.terminateReservation(context, history.last.id);
+                                await _controller.terminateReservation(
+                                    context, history.last.id);
                                 if (mounted) {
                                   Navigator.of(context).pop();
                                   await _initializeControllers();
@@ -405,14 +461,15 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                             ),
                           ),
                         ),
-                      if (!isAvailable && history.isEmpty)
+                      if (!isAvailable && (history.isEmpty || (history.last.status == 'refused' || history.last.status == 'terminated')))
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Padding(
                             padding: const EdgeInsets.only(top: 16.0),
                             child: ElevatedButton(
                               onPressed: () async {
-                                await _controller.changeLockerStatus(context, lockerId, 'available');
+                                await _controller.changeLockerStatus(
+                                    context, lockerId, 'available');
                                 if (mounted) {
                                   Navigator.of(context).pop();
                                   await _initializeControllers();
@@ -433,7 +490,8 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                             padding: const EdgeInsets.only(top: 16.0),
                             child: ElevatedButton(
                               onPressed: () async {
-                                await _controller.changeLockerStatus(context, lockerId, 'unavailable');
+                                await _controller.changeLockerStatus(
+                                    context, lockerId, 'unavailable');
                                 if (mounted) {
                                   Navigator.of(context).pop();
                                   await _initializeControllers();

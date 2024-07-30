@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:lockerz/utils/shared_prefs.dart';
 import '../services/user_service.dart';
+import '../views/shared/snackbar.dart';
 
 class EditAccountController {
   final TextEditingController firstNameController = TextEditingController();
@@ -21,11 +22,8 @@ class EditAccountController {
         await _userService.editUserInformations(firstName, lastName);
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                success ? 'Modification réussie' : 'Échec de la modification')),
-      );
+      showCustomSnackBar(context, success ? 'Les informations personnelles ont été modifiées'
+          : 'Erreur lors de la modification des informations personnelles');
     }
     if (success) {
       await SharedPrefs.getUser().then((user) {
@@ -42,22 +40,16 @@ class EditAccountController {
     final success =
         await _userService.editUserPassword(oldPassword, newPassword);
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                success ? 'Modification réussie' : 'Échec de la modification')),
-      );
+      showCustomSnackBar(context, success ? 'Le mot de passe a été modifié'
+          : 'Erreur lors de la modification du mot de passe');
     }
   }
 
   Future<bool> deleteAccount(BuildContext context) async {
     final success = await _userService.deleteUser();
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                success ? 'Suppression réussie' : 'Échec de la suppression')),
-      );
+      showCustomSnackBar(context, success ? 'Le compte a été supprimé'
+          : 'Erreur lors de la suppression du compte');
     }
     return success;
   }

@@ -4,7 +4,7 @@ import 'package:lockerz/controllers/admin_home_controller.dart';
 import 'package:lockerz/views/shared/navbar.dart';
 import 'package:lockerz/services/reservation_service.dart';
 import 'package:lockerz/models/reservation_model.dart';
-import 'package:lockerz/services/locker_service.dart'; 
+import 'package:lockerz/services/locker_service.dart';
 
 class AdminHomePage extends StatefulWidget {
   const AdminHomePage({super.key});
@@ -13,11 +13,13 @@ class AdminHomePage extends StatefulWidget {
   AdminHomePageState createState() => AdminHomePageState();
 }
 
-class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMixin {
+class AdminHomePageState extends State<AdminHomePage>
+    with TickerProviderStateMixin {
   late AdminHomePageController _controller;
   bool _isLoading = true;
   late TabController _tabController;
-  final LockerService _lockerService = LockerService(); // Instance du service LockerService
+  final LockerService _lockerService =
+      LockerService(); // Instance du service LockerService
 
   @override
   void initState() {
@@ -28,7 +30,8 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
 
   Future<void> _initializeControllers() async {
     await _controller.initialize();
-    _tabController = TabController(length: _controller.localisations.length, vsync: this);
+    _tabController =
+        TabController(length: _controller.localisations.length, vsync: this);
     setState(() {
       _isLoading = false;
     });
@@ -65,48 +68,85 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
 
   void _showAddLockerPopup(BuildContext context, String localisationId) {
     TextEditingController _numberController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Ajouter un nouveau casier'),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: _numberController,
-                  decoration: InputDecoration(
-                    labelText: 'Numéro du casier',
-                    border: OutlineInputBorder(),
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border:
+                      Border.all(color: Theme.of(context).colorScheme.primary),
+                  borderRadius: BorderRadius.circular(15),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.5,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Center(
+                        child: Text(
+                          'Ajouter un nouveau casier',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _numberController,
+                        decoration: InputDecoration(
+                          labelText: 'Numéro du casier',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              _createLocker(context, _numberController.text,
+                                  localisationId);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.secondary,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('Ajouter'),
+                          ),
+                          TextButton(
+                            child: const Text('Fermer'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    _createLocker(context, _numberController.text, localisationId);
-                  },
-                  child: const Text('Ajouter'),
-                ),
-              ],
+              ),
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Fermer'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
         );
       },
     );
   }
 
-  Future<void> _createLocker(BuildContext context, String number, String localisationId) async {
+  Future<void> _createLocker(
+      BuildContext context, String number, String localisationId) async {
     final int lockerNumber = int.tryParse(number) ?? -1;
     if (lockerNumber == -1) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -120,7 +160,8 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
       'localisation': localisationId,
     };
 
-    print('Données envoyées : $lockerData'); // Afficher les données dans la console
+    print(
+        'Données envoyées : $lockerData'); // Afficher les données dans la console
 
     final success = await _lockerService.createLocker(lockerData);
 
@@ -183,34 +224,66 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                       physics: const NeverScrollableScrollPhysics(),
                       children: _controller.localisations.map((localisation) {
                         final filteredLockers = _controller.lockers
-                            .where((locker) => locker.localisation.name == localisation.name)
+                            .where((locker) =>
+                                locker.localisation.name == localisation.name)
                             .toList();
                         return ListView(
                           children: <Widget>[
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 10,
-                                    crossAxisSpacing: 8.0,
-                                    mainAxisSpacing: 8.0,
-                                    childAspectRatio: 1.0,
-                                  ),
-                                  itemCount: filteredLockers.length + 1, // Add one more item for the "+" button
-                                  itemBuilder: (BuildContext context, int index) {
-                                    if (index == filteredLockers.length) {
-                                      return GestureDetector(
+                            Form(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Wrap(
+                                    spacing: 8.0, // Espacement horizontal
+                                    runSpacing: 8.0, // Espacement vertical
+                                    children: [
+                                      ...filteredLockers.map((locker) {
+                                        final isAvailable =
+                                            locker.status == 'available';
+                                        return GestureDetector(
+                                          onTap: () {
+                                            _showLockerHistory(context,
+                                                locker.id, isAvailable);
+                                          },
+                                          child: Container(
+                                            width: 48.0,
+                                            height: 48.0,
+                                            decoration: BoxDecoration(
+                                              color: isAvailable
+                                                  ? Colors.green
+                                                  : Colors.grey,
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              border: Border.all(
+                                                color: Colors.black,
+                                                width: 2.0,
+                                              ),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                '${locker.number}',
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      GestureDetector(
                                         onTap: () {
-                                          _showAddLockerPopup(context, localisation.id);
+                                          _showAddLockerPopup(
+                                              context, localisation.id);
                                         },
                                         child: Container(
+                                          width: 48.0,
+                                          height: 48.0,
                                           decoration: BoxDecoration(
                                             color: Colors.blue,
-
-                                            borderRadius: BorderRadius.circular(8.0),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
                                             border: Border.all(
                                               color: Colors.black,
                                               width: 2.0,
@@ -224,40 +297,12 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                                             ),
                                           ),
                                         ),
-                                      );
-                                    }
-                                    final locker = filteredLockers[index];
-                                    final isAvailable = locker.status == 'available';
-
-                                    return GestureDetector(
-                                      onTap: () {
-                                        _showLockerHistory(context, locker.id, isAvailable);
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: isAvailable ? Colors.green : Colors.grey,
-                                          borderRadius: BorderRadius.circular(8.0),
-                                          border: Border.all(
-                                            color: Colors.black,
-                                            width: 2.0,
-                                          ),
-                                        ),
-                                          child: Center(
-                                            child: Text(
-                                              '${locker.number}',
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
+                            ),
                           ],
                         );
                       }).toList(),
@@ -272,8 +317,10 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
     );
   }
 
-  void _showLockerHistory(BuildContext context, String lockerId, bool isAvailable) async {
-    List<Reservation> history = await ReservationService().getLockerHistory(lockerId);
+  void _showLockerHistory(
+      BuildContext context, String lockerId, bool isAvailable) async {
+    List<Reservation> history =
+        await ReservationService().getLockerHistory(lockerId);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -288,7 +335,8 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).colorScheme.primary),
+                  border:
+                      Border.all(color: Theme.of(context).colorScheme.primary),
                   borderRadius: BorderRadius.circular(15),
                   color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 ),
@@ -302,7 +350,8 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                       const Center(
                         child: Text(
                           'Réservations du casier',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -326,22 +375,32 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                                     margin: const EdgeInsets.only(bottom: 8),
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      border: Border.all(color: Theme.of(context).colorScheme.primary),
+                                      border: Border.all(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary),
                                       borderRadius: BorderRadius.circular(15),
-                                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withOpacity(0.1),
                                     ),
                                     child: ExpansionTile(
-                                      title: Text('${reservation.owner.firstname} ${reservation.owner.lastname} (${reservation.owner.email})'),
+                                      title: Text(
+                                          '${reservation.owner.firstname} ${reservation.owner.lastname} (${reservation.owner.email})'),
                                       trailing: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Text(_translateStatus(reservation.status)),
+                                          Text(_translateStatus(
+                                              reservation.status)),
                                           const Icon(Icons.arrow_drop_down),
                                         ],
                                       ),
-                                      children: reservation.members.map((member) {
+                                      children:
+                                          reservation.members.map((member) {
                                         return ListTile(
-                                          title: Text('${member.firstname} ${member.lastname} (${member.email})'),
+                                          title: Text(
+                                              '${member.firstname} ${member.lastname} (${member.email})'),
                                         );
                                       }).toList(),
                                     ),
@@ -359,7 +418,8 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                             padding: const EdgeInsets.only(top: 16.0),
                             child: ElevatedButton(
                               onPressed: () async {
-                                await _controller.terminateReservation(context, history.last.id);
+                                await _controller.terminateReservation(
+                                    context, history.last.id);
                                 await _initializeControllers();
                                 Navigator.of(context).pop();
                               },

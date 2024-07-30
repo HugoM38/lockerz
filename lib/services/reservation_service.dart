@@ -36,7 +36,7 @@ class ReservationService {
     Uri url = Uri.parse("$baseUrl/validateOrRefuse");
     try {
       final token = await SharedPrefs.getAuthToken();
-      debugPrint('Authorization Token: Bearer $token'); // Affichage du jeton
+      debugPrint('Authorization Token: Bearer $token');
       final response = await http.patch(
         url,
         headers: <String, String>{

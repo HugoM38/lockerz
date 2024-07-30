@@ -103,20 +103,25 @@ class HomePageController {
 
 
   Future<void> terminateReservation(BuildContext context) async {
-    if (currentReservation != null) {
-      final result = await ReservationService()
-          .terminateReservation(currentReservation!.id);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result
-                ? 'Réservation terminée avec succès!'
-                : 'Erreur de terminaison de réservation'),
-          ),
-        );
-      }
-    }
+  if (currentReservation != null) {
+    final result = await ReservationService()
+        .terminateReservation(currentReservation!.id);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(result
+            ? 'Réservation terminée avec succès!'
+            : 'Erreur de terminaison de réservation'),
+      ),
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Aucune réservation en cours.'),
+      ),
+    );
   }
+}
+
 
   Future<void> cancelReservation(BuildContext context) async {
     if (currentReservation != null) {

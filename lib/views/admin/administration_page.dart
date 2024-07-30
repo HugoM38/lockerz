@@ -90,8 +90,8 @@ class AdministrationPageState extends State<AdministrationPage> {
             MaterialPageRoute(builder: (context) => const AdminHomePage()),
           );
         },
-        child: const Icon(Icons.admin_panel_settings),
         tooltip: 'Accéder à la page administrateur',
+        child: const Icon(Icons.admin_panel_settings),
       ),
     );
   }

@@ -60,54 +60,58 @@ class HomePageController {
   }
 
   Future<void> submitForm(BuildContext context) async {
-  if (formKey.currentState?.validate() ?? false) {
-    if (selectedLockerId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez sélectionner un casier.')),
-      );
-      return;
-    }
-    if (!termsAccepted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Veuillez accepter les termes d\'utilisation.')),
-      );
-      return;
-    }
-    if (!isAnyUserSelected) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez sélectionner au moins un utilisateur.')),
-      );
-      return;
-    }
+    if (formKey.currentState?.validate() ?? false) {
+      if (selectedLockerId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Veuillez sélectionner un casier.')),
+        );
+        return;
+      }
+      if (!termsAccepted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Veuillez accepter les termes d\'utilisation.')),
+        );
+        return;
+      }
+      if (!isAnyUserSelected) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Veuillez sélectionner au moins un utilisateur.')),
+        );
+        return;
+      }
 
-    final result = await ReservationService().createReservation(
-      selectedLockerId!,
-      selectedUsers.map((u) => u.id).toList(),
-    );
+      final result = await ReservationService().createReservation(
+        selectedLockerId!,
+        selectedUsers.map((u) => u.id).toList(),
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(result
-            ? 'Formulaire soumis avec succès!'
-            : 'Erreur de création de réservation'),
-      ),
-    );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result
+                ? 'Formulaire soumis avec succès!'
+                : 'Erreur de création de réservation'),
+          ),
+        );
+      }
+    }
   }
-}
-
 
   Future<void> terminateReservation(BuildContext context) async {
     if (currentReservation != null) {
       final result = await ReservationService()
           .terminateReservation(currentReservation!.id);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result
-              ? 'Réservation terminée avec succès!'
-              : 'Erreur de terminaison de réservation'),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result
+                ? 'Réservation terminée avec succès!'
+                : 'Erreur de terminaison de réservation'),
+          ),
+        );
+      }
     }
   }
 
@@ -115,13 +119,15 @@ class HomePageController {
     if (currentReservation != null) {
       final result = await ReservationService()
           .terminateReservation(currentReservation!.id);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result
-              ? 'Réservation annulée avec succès!'
-              : 'Erreur d\'annulation de réservation'),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result
+                ? 'Réservation annulée avec succès!'
+                : 'Erreur d\'annulation de réservation'),
+          ),
+        );
+      }
     }
   }
 
@@ -129,13 +135,15 @@ class HomePageController {
     if (currentReservation != null) {
       final result =
           await ReservationService().leaveReservation(currentReservation!.id);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result
-              ? 'Vous vous êtes retiré du casier avec succès!'
-              : 'Erreur de retrait du casier'),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result
+                ? 'Vous vous êtes retiré du casier avec succès!'
+                : 'Erreur de retrait du casier'),
+          ),
+        );
+      }
     }
   }
 }

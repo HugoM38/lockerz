@@ -35,16 +35,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     });
   }
 
-  Future<void> _refreshCurrentReservation() async {
-    setState(() {
-      _isLoading = true;
-    });
-    _currentReservation = await ReservationService().getCurrentReservation();
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
   @override
   void dispose() {
     _tabController.dispose();

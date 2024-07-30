@@ -61,10 +61,12 @@ class LoginController {
                     Text('Email non vérifié. Veuillez vérifier votre email.')),
           );
           await _authService.sendCode(email);
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => VerificationView(
-                    email: email,
-                  )));
+          if (context.mounted) {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => VerificationView(
+                      email: email,
+                    )));
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(jsonDecode(response.body)["error"])),

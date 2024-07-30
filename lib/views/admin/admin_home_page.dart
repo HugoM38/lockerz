@@ -35,62 +35,67 @@ class AdminHomePageState extends State<AdminHomePage> {
     });
   }
 
-  void _showLockerHistory(BuildContext context, String lockerId, bool isAvailable) async {
-    List<String> history = await ReservationService().getLockerHistory(lockerId);
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Historique du casier'),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: history.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        title: Text(history[index]),
-                      );
-                    },
-                  ),
-                ),
-                if (!isAvailable)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _cancelReservation(lockerId);
-                        Navigator.of(context).pop();
+  void _showLockerHistory(
+      BuildContext context, String lockerId, bool isAvailable) async {
+    List<String> history =
+        await ReservationService().getLockerHistory(lockerId);
+    if (context.mounted) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Historique du casier'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: history.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ListTile(
+                          title: Text(history[index]),
+                        );
                       },
-                      child: const Text('Annuler la réservation'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                      ),
                     ),
                   ),
-              ],
+                  if (!isAvailable)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _cancelReservation(lockerId);
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Annuler la réservation'),
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Fermer'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Fermer'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   Future<void> _cancelReservation(String lockerId) async {
-    bool success = await ReservationService().valideToRefuseReservation(lockerId, 'available');
+    bool success = await ReservationService()
+        .valideToRefuseReservation(lockerId, 'available');
     if (success) {
       setState(() {
         // Update the state to reflect the changes
@@ -106,7 +111,9 @@ class AdminHomePageState extends State<AdminHomePage> {
         appBar: const NavBar(),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: _userReservation != null ? _buildReservationInfo() : _buildReservationForm(),
+          child: _userReservation != null
+              ? _buildReservationInfo()
+              : _buildReservationForm(),
         ),
       ),
     );
@@ -123,7 +130,8 @@ class AdminHomePageState extends State<AdminHomePage> {
         const SizedBox(height: 10),
         Text('Locker Number: ${_userReservation!.locker.number}'),
         Text('Locker Status: ${_userReservation!.locker.status}'),
-        Text('Locker Localisation: ${_userReservation!.locker.localisation.name}'),
+        Text(
+            'Locker Localisation: ${_userReservation!.locker.localisation.name}'),
         const SizedBox(height: 20),
         const Text(
           'Reservation Details',
@@ -148,7 +156,7 @@ class AdminHomePageState extends State<AdminHomePage> {
           child: TabBarView(
             children: _controller.localisations.map((localisation) {
               final filteredLockers = _controller.lockers
-                  .where((locker) => locker.localisation.name == localisation)
+                  .where((locker) => locker.localisation.name == localisation.name)
                   .toList();
               return ListView(
                 children: <Widget>[
@@ -159,13 +167,15 @@ class AdminHomePageState extends State<AdminHomePage> {
                       children: <Widget>[
                         const Text(
                           'Réserver un casier',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 10),
                         GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 10,
                             crossAxisSpacing: 8.0,
                             mainAxisSpacing: 8.0,
@@ -175,18 +185,22 @@ class AdminHomePageState extends State<AdminHomePage> {
                           itemBuilder: (BuildContext context, int index) {
                             final locker = filteredLockers[index];
                             final isAvailable = locker.status == 'available';
-                            final isSelected = _controller.selectedLockerId == locker.id;
+                            final isSelected =
+                                _controller.selectedLockerId == locker.id;
 
                             return GestureDetector(
                               onTap: () {
-                                _showLockerHistory(context, locker.id, isAvailable);
+                                _showLockerHistory(
+                                    context, locker.id, isAvailable);
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: isAvailable ? Colors.green : Colors.grey,
+                                  color:
+                                      isAvailable ? Colors.green : Colors.grey,
                                   borderRadius: BorderRadius.circular(8.0),
                                   border: Border.all(
-                                    color: isSelected ? Colors.red : Colors.black,
+                                    color:
+                                        isSelected ? Colors.red : Colors.black,
                                     width: 2.0,
                                   ),
                                 ),

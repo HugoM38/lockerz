@@ -55,15 +55,20 @@ class VerificationController {
 
     try {
       await _authService.sendCode(email);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Code renvoyé. Veuillez vérifier votre email.')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Code renvoyé. Veuillez vérifier votre email.')),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Une erreur est survenue lors de l\'envoi du code')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content:
+                  Text('Une erreur est survenue lors de l\'envoi du code')),
+        );
+      }
     }
 
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {

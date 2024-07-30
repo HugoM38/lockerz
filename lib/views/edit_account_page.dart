@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lockerz/views/login_view.dart';
 import 'package:lockerz/views/shared/navbar.dart';
@@ -36,6 +37,12 @@ class EditAccountPageState extends State<EditAccountPage> {
   }
 
   @override
+  void dispose() {
+    _editAccountController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
@@ -45,20 +52,28 @@ class EditAccountPageState extends State<EditAccountPage> {
 
     return Scaffold(
       appBar: const NavBar(),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height - kToolbarHeight, // Adjust height to account for the AppBar
+          ),
           child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: 600,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  buildEditForm(context),
-                  const SizedBox(height: 20),
-                ],
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  double maxWidth = constraints.maxWidth < 600 ? constraints.maxWidth : 600;
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: maxWidth,
+                        child: buildEditForm(context, maxWidth),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
@@ -67,143 +82,263 @@ class EditAccountPageState extends State<EditAccountPage> {
     );
   }
 
-  Widget buildEditForm(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Form(
-          key: _formKeyName,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              buildTextField(
-                controller: _editAccountController.firstNameController,
-                label: 'Prénom',
-                hint: 'Veuillez entrer votre prénom',
-                icon: Icons.person,
-              ),
-              const SizedBox(height: 10),
-              buildTextField(
-                controller: _editAccountController.lastNameController,
-                label: 'Nom',
-                hint: 'Veuillez entrer votre nom',
-                icon: Icons.person,
-              ),
-              const SizedBox(height: 20),
-              buildSaveChangesButton(context),
-              const SizedBox(height: 20),
-            ],
+  Widget buildEditForm(BuildContext context, double maxWidth) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).colorScheme.primary),
+        borderRadius: BorderRadius.circular(15),
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaY: 5, sigmaX: 5),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                Center(
+                  child: Text(
+                    "Modifier le Compte",
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          shadows: [
+                            const Shadow(
+                              blurRadius: 10.0,
+                              color: Colors.black,
+                              offset: Offset(2.0, 2.0),
+                            ),
+                          ],
+                        ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Form(
+                  key: _formKeyName,
+                  child: maxWidth > 400
+                      ? Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Prénom"),
+                                  buildTextField(
+                                    controller: _editAccountController.firstNameController,
+                                    label: 'Prénom',
+                                    icon: Icons.person,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Nom"),
+                                  buildTextField(
+                                    controller: _editAccountController.lastNameController,
+                                    label: 'Nom',
+                                    icon: Icons.person,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text("Prénom"),
+                            buildTextField(
+                              controller: _editAccountController.firstNameController,
+                              label: 'Prénom',
+                              icon: Icons.person,
+                            ),
+                            const SizedBox(height: 20),
+                            const Text("Nom"),
+                            buildTextField(
+                              controller: _editAccountController.lastNameController,
+                              label: 'Nom',
+                              icon: Icons.person,
+                            ),
+                          ],
+                        ),
+                ),
+                const SizedBox(height: 20),
+                buildSaveChangesButton(context),
+                const Divider(),
+                Form(
+                  key: _formKeyPassword,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const Text("Ancien mot de passe"),
+                      buildPasswordField(
+                        controller: _editAccountController.oldPasswordController,
+                        label: 'Ancien mot de passe',
+                        icon: Icons.lock,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Veuillez entrer votre ancien mot de passe';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      maxWidth > 400
+                          ? Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text("Nouveau mot de passe"),
+                                      buildPasswordField(
+                                        controller: _editAccountController.newPasswordController,
+                                        label: 'Nouveau mot de passe',
+                                        icon: Icons.lock,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Veuillez entrer un nouveau mot de passe';
+                                          } else if (!_passwordRegExp.hasMatch(value)) {
+                                            return 'Le mot de passe doit faire 8 caractères et contenir au moins une majuscule et un chiffre';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 20),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text("Confirmer le nouveau mot de passe"),
+                                      buildPasswordField(
+                                        controller: _editAccountController.samePasswordController,
+                                        label: 'Confirmer le nouveau mot de passe',
+                                        icon: Icons.lock,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Veuillez confirmer votre nouveau mot de passe';
+                                          } else if (value != _editAccountController.newPasswordController.text) {
+                                            return 'Les mots de passe ne correspondent pas';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text("Nouveau mot de passe"),
+                                buildPasswordField(
+                                  controller: _editAccountController.newPasswordController,
+                                  label: 'Nouveau mot de passe',
+                                  icon: Icons.lock,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Veuillez entrer un nouveau mot de passe';
+                                    } else if (!_passwordRegExp.hasMatch(value)) {
+                                      return 'Le mot de passe doit faire 8 caractères et contenir au moins une majuscule et un chiffre';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+                                const Text("Confirmer le nouveau mot de passe"),
+                                buildPasswordField(
+                                  controller: _editAccountController.samePasswordController,
+                                  label: 'Confirmer le nouveau mot de passe',
+                                  icon: Icons.lock,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Veuillez confirmer votre nouveau mot de passe';
+                                    } else if (value != _editAccountController.newPasswordController.text) {
+                                      return 'Les mots de passe ne correspondent pas';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            ),
+                      const SizedBox(height: 20),
+                      buildSavePasswordButton(context),
+                    ],
+                  ),
+                ),
+                const Divider(),
+                buildDeleteAccountButton(context),
+              ],
+            ),
           ),
         ),
-        const Divider(),
-        Form(
-          key: _formKeyPassword,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              buildPasswordField(
-                controller: _editAccountController.oldPasswordController,
-                label: 'Ancien mot de passe',
-                hint: 'Veuillez entrer votre ancien mot de passe',
-                icon: Icons.lock,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer votre ancien mot de passe';
-                  }
-                }
-              ),
-              const SizedBox(height: 10),
-              buildPasswordField(
-                controller: _editAccountController.newPasswordController,
-                label: 'Nouveau mot de passe',
-                hint: 'Veuillez entrer un nouveau mot de passe',
-                icon: Icons.lock,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer un nouveau mot de passe';
-                  } else if (!_passwordRegExp.hasMatch(value)) {
-                    return 'Le mot de passe doit faire 8 caractères et contenir au moins une majuscule et un chiffre';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 10),
-              buildPasswordField(
-                controller: _editAccountController.samePasswordController,
-                label: 'Confirmer le nouveau mot de passe',
-                hint: 'Veuillez confirmer votre nouveau mot de passe',
-                icon: Icons.lock,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez confirmer votre nouveau mot de passe';
-                  } else if (value != _editAccountController.newPasswordController.text) {
-                    return 'Les mots de passe ne correspondent pas';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              buildSavePasswordButton(context),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-        const Divider(),
-        buildDeleteAccountButton(context),
-      ],
+      ),
     );
   }
 
   Widget buildTextField({
     required TextEditingController controller,
     required String label,
-    required String hint,
     required IconData icon,
   }) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextFormField(
-            controller: controller,
-            decoration: InputDecoration(
-              labelText: label,
-              hintText: hint,
-              suffixIcon: Icon(icon),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Veuillez entrer $label';
-              }
-              return null;
-            },
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Theme.of(context).colorScheme.primary),
         ),
-      ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),
+        decoration: InputDecoration(
+          suffixIcon: Icon(icon, color: Theme.of(context).textTheme.bodyLarge!.color),
+          border: InputBorder.none,
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Veuillez entrer $label';
+          }
+          return null;
+        },
+      ),
     );
   }
 
   Widget buildPasswordField({
     required TextEditingController controller,
     required String label,
-    required String hint,
     required IconData icon,
     String? Function(String?)? validator,
   }) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextFormField(
-            controller: controller,
-            decoration: InputDecoration(
-              labelText: label,
-              hintText: hint,
-              suffixIcon: Icon(icon),
-            ),
-            obscureText: true,
-            validator: validator,
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Theme.of(context).colorScheme.primary),
         ),
-      ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),
+        obscureText: true,
+        decoration: InputDecoration(
+          suffixIcon: Icon(icon, color: Theme.of(context).textTheme.bodyLarge!.color),
+          border: InputBorder.none,
+        ),
+        validator: validator,
+      ),
     );
   }
 

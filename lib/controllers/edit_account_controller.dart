@@ -61,4 +61,12 @@ class EditAccountController {
     }
     return success;
   }
+
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    oldPasswordController.dispose();
+    newPasswordController.dispose();
+    samePasswordController.dispose();
+  }
 }

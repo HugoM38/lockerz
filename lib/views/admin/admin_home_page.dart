@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:lockerz/views/shared/navbar.dart';
-import '/controllers/home_page_controller.dart';
-import 'package:lockerz/services/reservation_service.dart';
+import 'package:lockerz/controllers/admin_home_controller.dart';
 import 'package:lockerz/models/reservation_model.dart';
+import 'package:lockerz/views/shared/navbar.dart';
+import 'package:lockerz/services/reservation_service.dart';
 
 class AdminHomePage extends StatefulWidget {
   const AdminHomePage({super.key});
@@ -13,20 +13,18 @@ class AdminHomePage extends StatefulWidget {
 }
 
 class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMixin {
-  late HomePageController _controller;
-  Reservation? _currentReservation;
+  late AdminHomePageController _controller;
   bool _isLoading = true;
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _controller = HomePageController();
+    _controller = AdminHomePageController();
     _initializeControllers();
   }
 
   Future<void> _initializeControllers() async {
-    _currentReservation = await ReservationService().getCurrentReservation();
     await _controller.initialize();
     _tabController = TabController(length: _controller.localisations.length, vsync: this);
     setState(() {
@@ -113,54 +111,51 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                             .toList();
                         return ListView(
                           children: <Widget>[
-                            Form(
-                              key: GlobalKey<FormState>(),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  GridView.builder(
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 10,
-                                      crossAxisSpacing: 8.0,
-                                      mainAxisSpacing: 8.0,
-                                      childAspectRatio: 1.0,
-                                    ),
-                                    itemCount: filteredLockers.length,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      final locker = filteredLockers[index];
-                                      final isAvailable = locker.status == 'available';
-
-                                      return GestureDetector(
-                                        onTap: () {
-                                          _showLockerHistory(context, locker.id, isAvailable);
-                                        },
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: isAvailable ? Colors.green : Colors.grey,
-                                            borderRadius: BorderRadius.circular(8.0),
-                                            border: Border.all(
-                                              color: Colors.black,
-                                              width: 2.0,
-                                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 10,
+                                    crossAxisSpacing: 8.0,
+                                    mainAxisSpacing: 8.0,
+                                    childAspectRatio: 1.0,
+                                  ),
+                                  itemCount: filteredLockers.length,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    final locker = filteredLockers[index];
+                                    final isAvailable = locker.status == 'available';
+                            
+                                    return GestureDetector(
+                                      onTap: () {
+                                        _showLockerHistory(context, locker.id, isAvailable);
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: isAvailable ? Colors.green : Colors.grey,
+                                          borderRadius: BorderRadius.circular(8.0),
+                                          border: Border.all(
+                                            color: Colors.black,
+                                            width: 2.0,
                                           ),
-                                          child: Center(
-                                            child: Text(
-                                              '${locker.number}',
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            '${locker.number}',
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
                                             ),
                                           ),
                                         ),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                           ],
                         );
@@ -177,7 +172,7 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
   }
 
   void _showLockerHistory(BuildContext context, String lockerId, bool isAvailable) async {
-  List<String> history = await ReservationService().getLockerHistory(lockerId);
+  List<Reservation> history = await ReservationService().getLockerHistory(lockerId);
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -194,7 +189,7 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                   itemCount: history.length,
                   itemBuilder: (BuildContext context, int index) {
                     return ListTile(
-                      title: Text(history[index]),
+                      title: Text(history[index].owner.firstname),
                     );
                   },
                 ),
@@ -204,15 +199,15 @@ class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMi
                   padding: const EdgeInsets.only(top: 16.0),
                   child: ElevatedButton(
                     onPressed: () async {
-                      await _controller.terminateReservation(context);
+                      await _controller.terminateReservation(context, history.last.id);
                       await _initializeControllers();
                       Navigator.of(context).pop();
                     },
-                    child: const Text('Annuler la réservation'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
                     ),
+                    child: const Text('Annuler la réservation'),
                   ),
                 ),
             ],

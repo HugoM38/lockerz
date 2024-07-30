@@ -19,14 +19,18 @@ class ReservationService {
           'Authorization': 'Bearer $token'
         },
       );
+      debugPrint('getReservation - Response status: ${response.statusCode}');
+      debugPrint('getReservation - Response body: ${response.body}');
       if (response.statusCode != 200) {
         debugPrint(response.body);
       }
       List<dynamic> body = jsonDecode(response.body);
       List<Reservation> reservations =
           body.map((dynamic item) => Reservation.fromJson(item)).toList();
+      debugPrint('getReservation - Reservations: $reservations');
       return reservations;
     } catch (e) {
+      debugPrint('getReservation - Exception: ${e.toString()}');
       throw Exception(e.toString());
     }
   }
@@ -48,12 +52,15 @@ class ReservationService {
           'status': status,
         }),
       );
+      debugPrint('valideToRefuseReservation - Response status: ${response.statusCode}');
+      debugPrint('valideToRefuseReservation - Response body: ${response.body}');
       if (response.statusCode != 200) {
         debugPrint(response.body);
         return false;
       }
       return true;
     } catch (e) {
+      debugPrint('valideToRefuseReservation - Exception: ${e.toString()}');
       throw Exception(e.toString());
     }
   }
@@ -75,12 +82,15 @@ class ReservationService {
           'members': membersId,
         }),
       );
+      debugPrint('createReservation - Response status: ${response.statusCode}');
+      debugPrint('createReservation - Response body: ${response.body}');
       if (response.statusCode != 201) {
         debugPrint(response.body);
         return false;
       }
       return true;
     } catch (e) {
+      debugPrint('createReservation - Exception: ${e.toString()}');
       throw Exception(e.toString());
     }
   }
@@ -97,22 +107,27 @@ class ReservationService {
           'Authorization': 'Bearer $token'
         },
       );
+      debugPrint('getCurrentReservation - Response status: ${response.statusCode}');
+      debugPrint('getCurrentReservation - Response body: ${response.body}');
       if (response.statusCode != 200) {
         debugPrint(response.body);
         return null;
       }
       List<dynamic> body = jsonDecode(response.body);
+      debugPrint('getCurrentReservation - Body: $body');
       if (body.isNotEmpty) {
         List<Reservation> reservations = body.map((dynamic item) => Reservation.fromJson(item)).toList();
+        debugPrint('getCurrentReservation - Reservations: $reservations');
         return reservations[0];
       }
       return null;
     } catch (e) {
+      debugPrint('getCurrentReservation - Exception: ${e.toString()}');
       throw Exception(e.toString());
     }
   }
 
-  Future<List<String>> getLockerHistory(String lockerId) async {
+  Future<List<Reservation>> getLockerHistory(String lockerId) async {
     Uri url = Uri.parse("$baseUrl/getLockerReservations/$lockerId");
     try {
       final token = await SharedPrefs.getAuthToken();
@@ -124,47 +139,64 @@ class ReservationService {
           'Authorization': 'Bearer $token'
         },
       );
+      debugPrint('getLockerHistory - Response status: ${response.statusCode}');
+      debugPrint('getLockerHistory - Response body: ${response.body}');
       if (response.statusCode != 200) {
         debugPrint(response.body);
         return [];
       }
       List<dynamic> body = jsonDecode(response.body);
-      List<String> history = body.map((dynamic item) {
-        final owner =
-            item['owner']['firstname'] + ' ' + item['owner']['lastname'];
-        final members = (item['members'] as List)
-            .map((member) => member['firstname'] + ' ' + member['lastname'])
-            .join(', ');
-        return 'Owner: $owner, Members: $members';
+      List<Reservation> history = body.map((dynamic reservation) {
+        
+        return Reservation.fromJson(reservation);
       }).toList();
+      debugPrint('getLockerHistory - History: $history');
       return history;
     } catch (e) {
+      debugPrint('getLockerHistory - Exception: ${e.toString()}');
       throw Exception(e.toString());
     }
   }
 
-  Future<bool> terminateReservation(String reservationId) async {
-    Uri url = Uri.parse("$baseUrl/terminateReservation");
-    try {
-      final response = await http.patch(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${await SharedPrefs.getAuthToken()}'
-        },
-        body: jsonEncode({
-          'reservationId': reservationId,
-        }),
-      );
-      if (response.statusCode != 200) {
-        debugPrint(response.body);
-        return false;
-      }
-      return true;
-    } catch (e) {
-      throw Exception(e.toString());
+ Future<bool> terminateReservation(String reservationId) async {
+  Uri url = Uri.parse("$baseUrl/terminateReservation");
+  try {
+    final token = await SharedPrefs.getAuthToken();
+    final bodyData = jsonEncode({
+      'reservationId': reservationId,
+    });
+
+    debugPrint('Authorization Token: Bearer $token'); 
+    debugPrint('reservationId $reservationId'); 
+    debugPrint('terminateReservation - Request URL: $url');
+    debugPrint('terminateReservation - Request Headers: ${{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token'
+    }}');
+    debugPrint('terminateReservation - Request Body: $bodyData');
+
+    final response = await http.patch(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+      body: bodyData,
+    );
+
+    debugPrint('terminateReservation - Response status: ${response.statusCode}');
+    debugPrint('terminateReservation - Response body: ${response.body}');
+    if (response.statusCode != 200) {
+      debugPrint('terminateReservation - Error: ${response.body}');
+      return false;
     }
+    return true;
+  } catch (e) {
+    debugPrint('terminateReservation - Exception: ${e.toString()}');
+    throw Exception(e.toString());
   }
+}
+
 
   Future<bool> leaveReservation(String reservationId) async {
     Uri url = Uri.parse("$baseUrl/leaveReservation");
@@ -181,12 +213,15 @@ class ReservationService {
           'reservationId': reservationId,
         }),
       );
+      debugPrint('leaveReservation - Response status: ${response.statusCode}');
+      debugPrint('leaveReservation - Response body: ${response.body}');
       if (response.statusCode != 200) {
         debugPrint(response.body);
         return false;
       }
       return true;
     } catch (e) {
+      debugPrint('leaveReservation - Exception: ${e.toString()}');
       throw Exception(e.toString());
     }
   }

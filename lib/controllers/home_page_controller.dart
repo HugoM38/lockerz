@@ -101,7 +101,6 @@ class HomePageController {
   return false;
 }
 
-
   Future<void> terminateReservation(BuildContext context) async {
   if (currentReservation != null) {
     final result = await ReservationService()

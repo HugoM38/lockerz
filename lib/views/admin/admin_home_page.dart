@@ -141,7 +141,7 @@ class AdminHomePageState extends State<AdminHomePage> {
         TabBar(
           isScrollable: true,
           tabs: _controller.localisations.map((localisation) {
-            return Tab(text: localisation);
+            return Tab(text: localisation.name);
           }).toList(),
         ),
         Expanded(

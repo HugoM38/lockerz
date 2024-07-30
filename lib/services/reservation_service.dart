@@ -11,7 +11,7 @@ class ReservationService {
     Uri url = Uri.parse("$baseUrl/pendingReservation");
     try {
       final token = await SharedPrefs.getAuthToken();
-      debugPrint('Authorization Token: Bearer $token');  // Affichage du jeton
+      debugPrint('Authorization Token: Bearer $token'); // Affichage du jeton
       final response = await http.get(
         url,
         headers: <String, String>{
@@ -23,18 +23,20 @@ class ReservationService {
         debugPrint(response.body);
       }
       List<dynamic> body = jsonDecode(response.body);
-      List<Reservation> reservations = body.map((dynamic item) => Reservation.fromJson(item)).toList();
+      List<Reservation> reservations =
+          body.map((dynamic item) => Reservation.fromJson(item)).toList();
       return reservations;
     } catch (e) {
       throw Exception(e.toString());
     }
   }
 
-  Future<bool> valideToRefuseReservation(String reservationId, String status) async {
+  Future<bool> valideToRefuseReservation(
+      String reservationId, String status) async {
     Uri url = Uri.parse("$baseUrl/validateOrRefuse");
     try {
       final token = await SharedPrefs.getAuthToken();
-      debugPrint('Authorization Token: Bearer $token');  // Affichage du jeton
+      debugPrint('Authorization Token: Bearer $token'); // Affichage du jeton
       final response = await http.patch(
         url,
         headers: <String, String>{
@@ -56,11 +58,12 @@ class ReservationService {
     }
   }
 
-  Future<bool> createReservation(String lockerId, List<String> membersId) async {
+  Future<bool> createReservation(
+      String lockerId, List<String> membersId) async {
     Uri url = Uri.parse("$baseUrl/create");
     try {
       final token = await SharedPrefs.getAuthToken();
-      debugPrint('Authorization Token: Bearer $token');  // Affichage du jeton
+      debugPrint('Authorization Token: Bearer $token'); // Affichage du jeton
       final response = await http.post(
         url,
         headers: <String, String>{
@@ -98,10 +101,10 @@ class ReservationService {
         debugPrint(response.body);
         return null;
       }
-
-      dynamic body = jsonDecode(response.body);
-      if (body != null && body.isNotEmpty) {
-        return Reservation.fromJson(body);
+      List<dynamic> body = jsonDecode(response.body);
+      if (body.isNotEmpty) {
+        List<Reservation> reservations = body.map((dynamic item) => Reservation.fromJson(item)).toList();
+        return reservations[0];
       }
       return null;
     } catch (e) {
@@ -127,11 +130,37 @@ class ReservationService {
       }
       List<dynamic> body = jsonDecode(response.body);
       List<String> history = body.map((dynamic item) {
-        final owner = item['owner']['firstname'] + ' ' + item['owner']['lastname'];
-        final members = (item['members'] as List).map((member) => member['firstname'] + ' ' + member['lastname']).join(', ');
+        final owner =
+            item['owner']['firstname'] + ' ' + item['owner']['lastname'];
+        final members = (item['members'] as List)
+            .map((member) => member['firstname'] + ' ' + member['lastname'])
+            .join(', ');
         return 'Owner: $owner, Members: $members';
       }).toList();
       return history;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<bool> terminateReservation(String reservationId) async {
+    Uri url = Uri.parse("$baseUrl/terminateReservation");
+    try {
+      final response = await http.patch(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${await SharedPrefs.getAuthToken()}'
+        },
+        body: jsonEncode({
+          'reservationId': reservationId,
+        }),
+      );
+      if (response.statusCode != 200) {
+        debugPrint(response.body);
+        return false;
+      }
+      return true;
     } catch (e) {
       throw Exception(e.toString());
     }
@@ -141,7 +170,7 @@ class ReservationService {
     Uri url = Uri.parse("$baseUrl/leaveReservation");
     try {
       final token = await SharedPrefs.getAuthToken();
-      debugPrint('Authorization Token: Bearer $token');  // Affichage du jeton
+      debugPrint('Authorization Token: Bearer $token'); // Affichage du jeton
       final response = await http.patch(
         url,
         headers: <String, String>{

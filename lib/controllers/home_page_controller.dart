@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lockerz/models/localisation_model.dart';
 import 'package:lockerz/models/user_model.dart';
+import 'package:lockerz/services/localisation_service.dart';
 import 'package:lockerz/services/locker_service.dart';
 import 'package:lockerz/services/user_service.dart';
 import 'package:lockerz/services/reservation_service.dart';
@@ -16,7 +18,7 @@ class HomePageController {
   String searchQuery = '';
   bool termsAccepted = false;
   List<Locker> lockers = [];
-  List<String> localisations = [];
+  List<Localisation> localisations = [];
   User? currentUser;
   Reservation? currentReservation;
 
@@ -31,7 +33,7 @@ class HomePageController {
     users = fetchedUsers.where((user) => user.id != currentUser?.id).toList();
     filteredUsers = users;
     lockers = fetchedLockers;
-    localisations = lockers.map((locker) => locker.localisation.name).toSet().toList();
+    localisations = await LocalisationService().getLocalisation();
 
     // Récupérer la réservation actuelle
     currentReservation = await ReservationService().getCurrentReservation();
@@ -41,9 +43,9 @@ class HomePageController {
     searchQuery = query;
     filteredUsers = users
         .where((user) =>
-    user.firstname.toLowerCase().contains(query.toLowerCase()) ||
-        user.lastname.toLowerCase().contains(query.toLowerCase()) ||
-        user.email.toLowerCase().contains(query.toLowerCase()))
+            user.firstname.toLowerCase().contains(query.toLowerCase()) ||
+            user.lastname.toLowerCase().contains(query.toLowerCase()) ||
+            user.email.toLowerCase().contains(query.toLowerCase()))
         .toList();
   }
 
@@ -67,7 +69,8 @@ class HomePageController {
       }
       if (!termsAccepted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Veuillez accepter les termes d\'utilisation.')),
+          const SnackBar(
+              content: Text('Veuillez accepter les termes d\'utilisation.')),
         );
         return;
       }
@@ -79,7 +82,9 @@ class HomePageController {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result ? 'Formulaire soumis avec succès!' : 'Erreur de création de réservation'),
+          content: Text(result
+              ? 'Formulaire soumis avec succès!'
+              : 'Erreur de création de réservation'),
         ),
       );
     }
@@ -87,10 +92,13 @@ class HomePageController {
 
   Future<void> terminateReservation(BuildContext context) async {
     if (currentReservation != null) {
-      final result = await ReservationService().terminateReservation(currentReservation!.id);
+      final result = await ReservationService()
+          .terminateReservation(currentReservation!.id);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result ? 'Réservation terminée avec succès!' : 'Erreur de terminaison de réservation'),
+          content: Text(result
+              ? 'Réservation terminée avec succès!'
+              : 'Erreur de terminaison de réservation'),
         ),
       );
     }
@@ -98,10 +106,13 @@ class HomePageController {
 
   Future<void> cancelReservation(BuildContext context) async {
     if (currentReservation != null) {
-      final result = await ReservationService().terminateReservation(currentReservation!.id);
+      final result = await ReservationService()
+          .terminateReservation(currentReservation!.id);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result ? 'Réservation annulée avec succès!' : 'Erreur d\'annulation de réservation'),
+          content: Text(result
+              ? 'Réservation annulée avec succès!'
+              : 'Erreur d\'annulation de réservation'),
         ),
       );
     }
@@ -109,10 +120,13 @@ class HomePageController {
 
   Future<void> retireFromLocker(BuildContext context) async {
     if (currentReservation != null) {
-      final result = await ReservationService().leaveReservation(currentReservation!.id);
+      final result =
+          await ReservationService().leaveReservation(currentReservation!.id);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result ? 'Vous vous êtes retiré du casier avec succès!' : 'Erreur de retrait du casier'),
+          content: Text(result
+              ? 'Vous vous êtes retiré du casier avec succès!'
+              : 'Erreur de retrait du casier'),
         ),
       );
     }

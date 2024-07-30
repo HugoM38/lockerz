@@ -15,13 +15,11 @@ class AdminHomePage extends StatefulWidget {
   AdminHomePageState createState() => AdminHomePageState();
 }
 
-class AdminHomePageState extends State<AdminHomePage>
-    with TickerProviderStateMixin {
+class AdminHomePageState extends State<AdminHomePage> with TickerProviderStateMixin {
   late AdminHomePageController _controller;
   bool _isLoading = true;
-  late TabController _tabController;
-  final LockerService _lockerService =
-      LockerService(); // Instance du service LockerService
+  TabController? _tabController;
+  final LockerService _lockerService = LockerService();
 
   @override
   void initState() {
@@ -32,16 +30,17 @@ class AdminHomePageState extends State<AdminHomePage>
 
   Future<void> _initializeControllers() async {
     await _controller.initialize();
-    _tabController =
-        TabController(length: _controller.localisations.length, vsync: this);
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _tabController = TabController(length: _controller.localisations.length, vsync: this);
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _tabController?.dispose();
     super.dispose();
   }
 
@@ -85,8 +84,7 @@ class AdminHomePageState extends State<AdminHomePage>
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  border:
-                      Border.all(color: Theme.of(context).colorScheme.primary),
+                  border: Border.all(color: Theme.of(context).colorScheme.primary),
                   borderRadius: BorderRadius.circular(15),
                   color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 ),
@@ -100,8 +98,7 @@ class AdminHomePageState extends State<AdminHomePage>
                       const Center(
                         child: Text(
                           'Ajouter un nouveau casier',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -118,12 +115,10 @@ class AdminHomePageState extends State<AdminHomePage>
                         children: [
                           ElevatedButton(
                             onPressed: () {
-                              _createLocker(context, _numberController.text,
-                                  localisationId);
+                              _createLocker(context, _numberController.text, localisationId);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.secondary,
+                              backgroundColor: Theme.of(context).colorScheme.secondary,
                               foregroundColor: Colors.white,
                             ),
                             child: const Text('Ajouter'),
@@ -147,8 +142,7 @@ class AdminHomePageState extends State<AdminHomePage>
     );
   }
 
-  Future<void> _createLocker(
-      BuildContext context, String number, String localisationId) async {
+  Future<void> _createLocker(BuildContext context, String number, String localisationId) async {
     final int lockerNumber = int.tryParse(number) ?? -1;
     if (lockerNumber == -1) {
       showCustomSnackBar(context, 'Veuillez entrer un numéro de casier valide');
@@ -160,15 +154,16 @@ class AdminHomePageState extends State<AdminHomePage>
       'localisation': localisationId,
     };
 
-    print(
-        'Données envoyées : $lockerData'); // Afficher les données dans la console
+    print('Données envoyées : $lockerData'); // Afficher les données dans la console
 
     final success = await _lockerService.createLocker(lockerData);
 
     if (success) {
       showCustomSnackBar(context, 'Casier ajouté avec succès');
-      Navigator.of(context).pop();
-      await _initializeControllers(); // Rafraîchir les données après ajout
+      if (mounted) {
+        Navigator.of(context).pop();
+        await _initializeControllers(); // Rafraîchir les données après ajout
+      }
     } else {
       showCustomSnackBar(context, 'Erreur lors de l\'ajout du casier');
     }
@@ -201,108 +196,104 @@ class AdminHomePageState extends State<AdminHomePage>
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  TabBar(
-                    controller: _tabController,
-                    isScrollable: true,
-                    tabs: _controller.localisations.map((localisation) {
-                      return Tab(
-                        text: localisation.name,
-                        icon: localisation.accessibility
-                            ? const Icon(Icons.wheelchair_pickup)
-                            : const Icon(Icons.accessibility),
-                      );
-                    }).toList(),
-                  ),
+                  _tabController == null
+                      ? Container()
+                      : TabBar(
+                          controller: _tabController,
+                          isScrollable: true,
+                          tabs: _controller.localisations.map((localisation) {
+                            return Tab(
+                              text: localisation.name,
+                              icon: localisation.accessibility
+                                  ? const Icon(Icons.wheelchair_pickup)
+                                  : const Icon(Icons.accessibility),
+                            );
+                          }).toList(),
+                        ),
                   const SizedBox(height: 20),
                   Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: _controller.localisations.map((localisation) {
-                        final filteredLockers = _controller.lockers
-                            .where((locker) =>
-                                locker.localisation.name == localisation.name)
-                            .toList();
-                        return ListView(
-                          children: <Widget>[
-                            Form(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                    child: _tabController == null
+                        ? Container()
+                        : TabBarView(
+                            controller: _tabController,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: _controller.localisations.map((localisation) {
+                              final filteredLockers = _controller.lockers
+                                  .where((locker) => locker.localisation.name == localisation.name)
+                                  .toList();
+                              return ListView(
                                 children: <Widget>[
-                                  Wrap(
-                                    spacing: 8.0, // Espacement horizontal
-                                    runSpacing: 8.0, // Espacement vertical
-                                    children: [
-                                      ...filteredLockers.map((locker) {
-                                        final isAvailable =
-                                            locker.status == 'available';
-                                        return GestureDetector(
-                                          onTap: () {
-                                            _showLockerHistory(context,
-                                                locker.id, isAvailable);
-                                          },
-                                          child: Container(
-                                            width: 48.0,
-                                            height: 48.0,
-                                            decoration: BoxDecoration(
-                                              color: isAvailable
-                                                  ? Colors.green
-                                                  : Colors.grey,
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              border: Border.all(
-                                                color: Colors.black,
-                                                width: 2.0,
-                                              ),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                '${locker.number}',
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
+                                  Form(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Wrap(
+                                          spacing: 8.0, // Espacement horizontal
+                                          runSpacing: 8.0, // Espacement vertical
+                                          children: [
+                                            ...filteredLockers.map((locker) {
+                                              final isAvailable = locker.status == 'available';
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  _showLockerHistory(context, locker.id, isAvailable);
+                                                },
+                                                child: Container(
+                                                  width: 48.0,
+                                                  height: 48.0,
+                                                  decoration: BoxDecoration(
+                                                    color: isAvailable ? Colors.green : Colors.grey,
+                                                    borderRadius: BorderRadius.circular(8.0),
+                                                    border: Border.all(
+                                                      color: Colors.black,
+                                                      width: 2.0,
+                                                    ),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      '${locker.number}',
+                                                      style: const TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                            GestureDetector(
+                                              onTap: () {
+                                                _showAddLockerPopup(context, localisation.id);
+                                              },
+                                              child: Container(
+                                                width: 48.0,
+                                                height: 48.0,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.blue,
+                                                  borderRadius: BorderRadius.circular(8.0),
+                                                  border: Border.all(
+                                                    color: Colors.black,
+                                                    width: 2.0,
+                                                  ),
+                                                ),
+                                                child: const Center(
+                                                  child: Icon(
+                                                    Icons.add,
+                                                    color: Colors.white,
+                                                    size: 30.0,
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                        );
-                                      }).toList(),
-                                      GestureDetector(
-                                        onTap: () {
-                                          _showAddLockerPopup(
-                                              context, localisation.id);
-                                        },
-                                        child: Container(
-                                          width: 48.0,
-                                          height: 48.0,
-                                          decoration: BoxDecoration(
-                                            color: Colors.blue,
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            border: Border.all(
-                                              color: Colors.black,
-                                              width: 2.0,
-                                            ),
-                                          ),
-                                          child: const Center(
-                                            child: Icon(
-                                              Icons.add,
-                                              color: Colors.white,
-                                              size: 30.0,
-                                            ),
-                                          ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ],
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
-                    ),
+                              );
+                            }).toList(),
+                          ),
                   ),
                 ],
               ),
@@ -313,10 +304,8 @@ class AdminHomePageState extends State<AdminHomePage>
     );
   }
 
-  void _showLockerHistory(
-      BuildContext context, String lockerId, bool isAvailable) async {
-    List<Reservation> history =
-        await ReservationService().getLockerHistory(lockerId);
+  void _showLockerHistory(BuildContext context, String lockerId, bool isAvailable) async {
+    List<Reservation> history = await ReservationService().getLockerHistory(lockerId);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -331,8 +320,7 @@ class AdminHomePageState extends State<AdminHomePage>
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  border:
-                      Border.all(color: Theme.of(context).colorScheme.primary),
+                  border: Border.all(color: Theme.of(context).colorScheme.primary),
                   borderRadius: BorderRadius.circular(15),
                   color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 ),
@@ -346,8 +334,7 @@ class AdminHomePageState extends State<AdminHomePage>
                       const Center(
                         child: Text(
                           'Réservations du casier',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -371,32 +358,22 @@ class AdminHomePageState extends State<AdminHomePage>
                                     margin: const EdgeInsets.only(bottom: 8),
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary),
+                                      border: Border.all(color: Theme.of(context).colorScheme.primary),
                                       borderRadius: BorderRadius.circular(15),
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary
-                                          .withOpacity(0.1),
+                                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                                     ),
                                     child: ExpansionTile(
-                                      title: Text(
-                                          '${reservation.owner.firstname} ${reservation.owner.lastname} (${reservation.owner.email})'),
+                                      title: Text('${reservation.owner.firstname} ${reservation.owner.lastname} (${reservation.owner.email})'),
                                       trailing: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Text(_translateStatus(
-                                              reservation.status)),
+                                          Text(_translateStatus(reservation.status)),
                                           const Icon(Icons.arrow_drop_down),
                                         ],
                                       ),
-                                      children:
-                                          reservation.members.map((member) {
+                                      children: reservation.members.map((member) {
                                         return ListTile(
-                                          title: Text(
-                                              '${member.firstname} ${member.lastname} (${member.email})'),
+                                          title: Text('${member.firstname} ${member.lastname} (${member.email})'),
                                         );
                                       }).toList(),
                                     ),
@@ -407,23 +384,66 @@ class AdminHomePageState extends State<AdminHomePage>
                           ),
                         ),
                       ),
-                      if (!isAvailable)
+                      if (!isAvailable && history.isNotEmpty)
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Padding(
                             padding: const EdgeInsets.only(top: 16.0),
                             child: ElevatedButton(
                               onPressed: () async {
-                                await _controller.terminateReservation(
-                                    context, history.last.id);
-                                await _initializeControllers();
-                                Navigator.of(context).pop();
+                                await _controller.terminateReservation(context, history.last.id);
+                                if (mounted) {
+                                  Navigator.of(context).pop();
+                                  await _initializeControllers();
+                                }
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red,
                                 foregroundColor: Colors.white,
                               ),
                               child: const Text('Annuler la réservation'),
+                            ),
+                          ),
+                        ),
+                      if (!isAvailable && history.isEmpty)
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 16.0),
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                await _controller.changeLockerStatus(context, lockerId, 'available');
+                                if (mounted) {
+                                  Navigator.of(context).pop();
+                                  await _initializeControllers();
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.white,
+                              ),
+                              child: const Text('Déverouiller le casier'),
+                            ),
+                          ),
+                        ),
+                      if (isAvailable)
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 16.0),
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                await _controller.changeLockerStatus(context, lockerId, 'unavailable');
+                                if (mounted) {
+                                  Navigator.of(context).pop();
+                                  await _initializeControllers();
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                              ),
+                              child: const Text('Verouiller le casier'),
                             ),
                           ),
                         ),

@@ -71,4 +71,28 @@ class LockerService {
       throw Exception(e.toString());
     }
   }
+
+  Future<bool> changeLockerStatus(String lockerId, String status) async {
+    Uri url = Uri.parse("$baseUrl/changeStatus");
+    try {
+      final response = await http.patch(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${await SharedPrefs.getAuthToken()}'
+        },
+        body: jsonEncode({
+          'id': lockerId,
+          'status': status,
+        }),
+      );
+      if (response.statusCode != 200) {
+        debugPrint(response.body);
+        return false;
+      }
+      return true;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 }

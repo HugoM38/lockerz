@@ -24,4 +24,14 @@ class AdminHomePageController {
     showCustomSnackBar(context, result ? 'Réservation terminée avec succès'
         : 'Erreur lors de la terminaison de la réservation');
   }
+
+  Future<void> changeLockerStatus(
+      BuildContext context, String lockerId, String status) async {
+    final result = await LockerService().changeLockerStatus(lockerId, status);
+    if (result) {
+      showCustomSnackBar(context, 'Casier mis à jour avec succès');
+    } else {
+      showCustomSnackBar(context, 'Erreur lors de la mise à jour du casier');
+    }
+  }
 }

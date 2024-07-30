@@ -23,10 +23,8 @@ class HomePageController {
   Reservation? currentReservation;
 
   Future<void> initialize() async {
-    // Récupérer l'utilisateur connecté
     currentUser = await SharedPrefs.getUser();
 
-    // Récupérer les utilisateurs et casiers
     List<User> fetchedUsers = await UserService().getUsers();
     List<Locker> fetchedLockers = await LockerService().getLockers();
 
@@ -35,8 +33,9 @@ class HomePageController {
     lockers = fetchedLockers;
     localisations = await LocalisationService().getLocalisation();
 
-    // Récupérer la réservation actuelle
     currentReservation = await ReservationService().getCurrentReservation();
+
+    updateSearchQuery('');
   }
 
   void updateSearchQuery(String query) {

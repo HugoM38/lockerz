@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
   HomePageState createState() => HomePageState();
 }
 
-class HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late HomePageController _controller;
   Reservation? _currentReservation;
   bool _isLoading = true;
@@ -149,7 +149,7 @@ class HomePageState extends State<HomePage> with SingleTickerProviderStateMixin 
                       ),
                     ),
                   ),
-                  _buildCard('Statut', Icons.info, _currentReservation!.status),
+                  _buildCard('Statut', Icons.info, _translateStatus(_currentReservation!.status)),
                   const SizedBox(height: 16),
                   Center(
                     child: Column(
@@ -209,6 +209,17 @@ class HomePageState extends State<HomePage> with SingleTickerProviderStateMixin 
     );
   }
 
+  String _translateStatus(String status) {
+    switch (status) {
+      case 'pending':
+        return 'En attente';
+      case 'accepted':
+        return 'Acceptée';
+      default:
+        return status;
+    }
+  }
+
   Widget _buildReservationForm() {
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -264,7 +275,7 @@ class HomePageState extends State<HomePage> with SingleTickerProviderStateMixin 
                         return ListView(
                           children: <Widget>[
                             Form(
-                              key: GlobalKey<FormState>(), // Ensure unique key
+                              key: _controller.formKey,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[

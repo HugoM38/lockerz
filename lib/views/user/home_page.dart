@@ -28,7 +28,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Future<void> _initializeControllers() async {
     _currentReservation = await ReservationService().getCurrentReservation();
     await _controller.initialize();
-    _tabController = TabController(length: _controller.localisations.length, vsync: this);
+    _tabController =
+        TabController(length: _controller.localisations.length, vsync: this);
     setState(() {
       _isLoading = false;
     });
@@ -149,7 +150,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  _buildCard('Statut', Icons.info, _translateStatus(_currentReservation!.status)),
+                  _buildCard('Statut', Icons.info,
+                      _translateStatus(_currentReservation!.status)),
                   const SizedBox(height: 16),
                   Center(
                     child: Column(
@@ -175,8 +177,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.white,
-                                backgroundColor:
-                                    Colors.red,
+                                backgroundColor: Colors.red,
                               ),
                               child: Text(isPending
                                   ? 'Annuler la réservation'
@@ -266,7 +267,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   Expanded(
                     child: TabBarView(
                       controller: _tabController,
-                      physics: const NeverScrollableScrollPhysics(), // Disable scrolling
+                      physics:
+                          const NeverScrollableScrollPhysics(), // Disable scrolling
                       children: _controller.localisations.map((localisation) {
                         final filteredLockers = _controller.lockers
                             .where((locker) =>
@@ -446,20 +448,73 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Règles pour le cadenas'),
-          content: const Text(
-            'Cadenas à clés : Obligation de déposer un double de la clé à l\'accueil.\n'
-            'Cadenas à code : Obligation de déposer le code à l\'accueil.',
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border:
+                      Border.all(color: Theme.of(context).colorScheme.primary),
+                  borderRadius: BorderRadius.circular(15),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.4,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Règles pour le cadenas',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "Cadenas à clés : ",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const Text(
+                          "Obligation de déposer un double de la clé à l'accueil.",
+                          style: TextStyle(fontSize: 14)),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Cadenas à code : ",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const Text(
+                          "Le code doit être partagé avec les membres de l'équipe et l'accueil.",
+                          style: TextStyle(fontSize: 14)),
+                      const SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                          ),
+                          child: const Text('OK'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ],
+          ),
         );
       },
     );

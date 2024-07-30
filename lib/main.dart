@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lockerz/controllers/auth_controller.dart';
+import 'package:lockerz/models/user_model.dart';
+import 'package:lockerz/utils/shared_prefs.dart';
 import 'package:lockerz/views/admin/admin_home_page.dart';
 import 'package:lockerz/views/admin/administration_page.dart';
 import 'package:lockerz/views/auth/edit_account_page.dart';
@@ -40,14 +43,78 @@ class Lockerz extends StatelessWidget {
       ),
       initialRoute: '/login',
       navigatorObservers: [AuthObserver()],
-      routes: {
-        '/login': (context) => const LoginView(),
-        '/signup': (context) => const SignupView(),
-        '/account': (context) => const EditAccountPage(),
-        '/home': (context) => const HomePage(),
-        '/admin-home': (context) => const AdminHomePage(),
-        '/admin': (context) => const AdministrationPage(),
+      onGenerateRoute: (RouteSettings settings) {
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) {
+            return FutureBuilder<bool>(
+              future: _checkAuthentication(context, settings.name!),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (!snapshot.hasData || !snapshot.data!) {
+                  return const LoginView(); // Redirect to login if not authenticated
+                }
+
+                switch (settings.name) {
+                  case '/login':
+                    return const LoginView();
+                  case '/signup':
+                    return const SignupView();
+                  case '/account':
+                    return const EditAccountPage();
+                  case '/home':
+                    return const HomePage();
+                  case '/admin-home':
+                    return const AdminHomePage();
+                  case '/admin':
+                    return const AdministrationPage();
+                  default:
+                    return const LoginView(); // Fallback to login
+                }
+              },
+            );
+          },
+        );
       },
     );
+  }
+
+  Future<bool> _checkAuthentication(
+      BuildContext context, String routeName) async {
+    bool isUserLogged = await AuthController().isLoggedIn();
+
+    if (isUserLogged) {
+      User user = await SharedPrefs.getUser();
+      if (routeName == '/login' || routeName == '/signup') {
+        if (context.mounted) {
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/home', (Route<dynamic> route) => false);
+          return false;
+        }
+      } else if (routeName == '/home' && user.role == 'admin') {
+        if (context.mounted) {
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/admin-home', (Route<dynamic> route) => false);
+          return false;
+        }
+      } else if (routeName == '/admin-home' && user.role == 'user') {
+        if (context.mounted) {
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/home', (Route<dynamic> route) => false);
+          return false;
+        }
+      }
+    } else if (routeName != '/login' && routeName != '/signup') {
+      if (context.mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/login', (Route<dynamic> route) => false);
+        return false;
+      }
+    }
+
+    return true;
   }
 }

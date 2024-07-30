@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:lockerz/models/user_model.dart';
+import 'package:lockerz/utils/shared_prefs.dart';
 import '../services/auth_service.dart';
 import '../views/auth/verification_view.dart';
 
@@ -53,7 +55,15 @@ class LoginController {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Connexion réussie')),
           );
-          Navigator.of(context).pushReplacementNamed('/home');
+
+          User user = await SharedPrefs.getUser();
+          if (context.mounted) {
+            if (user.role == 'admin') {
+              Navigator.of(context).pushReplacementNamed('/admin-home');
+            } else {
+              Navigator.of(context).pushReplacementNamed('/home');
+            }
+          }
         } else if (response.statusCode == 403) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

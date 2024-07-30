@@ -16,7 +16,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late HomePageController _controller;
   Reservation? _currentReservation;
   bool _isLoading = true;
-  late TabController _tabController;
+  TabController? _tabController;
 
   @override
   void initState() {
@@ -28,16 +28,18 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Future<void> _initializeControllers() async {
     _currentReservation = await ReservationService().getCurrentReservation();
     await _controller.initialize();
-    _tabController =
-        TabController(length: _controller.localisations.length, vsync: this);
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _tabController =
+            TabController(length: _controller.localisations.length, vsync: this);
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _tabController?.dispose();
     super.dispose();
   }
 
@@ -150,7 +152,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           ElevatedButton(
                             onPressed: () async {
                               await _controller.retireFromLocker(context);
-                              await _initializeControllers();
+                              if (mounted) {
+                                await _initializeControllers();
+                              }
                             },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
@@ -163,7 +167,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             ElevatedButton(
                               onPressed: () async {
                                 await _controller.terminateReservation(context);
-                                await _initializeControllers();
+                                if (mounted) {
+                                  await _initializeControllers();
+                                }
                               },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.white,
@@ -240,187 +246,191 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  TabBar(
-                    controller: _tabController,
-                    isScrollable: true,
-                    tabs: _controller.localisations.map((localisation) {
-                      return Tab(
-                        text: localisation.name,
-                        icon: localisation.accessibility
-                            ? const Icon(
-                                Icons.wheelchair_pickup) // Icône de handicap
-                            : const Icon(Icons.accessibility),
-                      );
-                    }).toList(),
-                  ),
+                  _tabController == null
+                      ? Container()
+                      : TabBar(
+                          controller: _tabController,
+                          isScrollable: true,
+                          tabs: _controller.localisations.map((localisation) {
+                            return Tab(
+                              text: localisation.name,
+                              icon: localisation.accessibility
+                                  ? const Icon(
+                                      Icons.wheelchair_pickup) // Icône de handicap
+                                  : const Icon(Icons.accessibility),
+                            );
+                          }).toList(),
+                        ),
                   const SizedBox(height: 20),
                   Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      physics:
-                          const NeverScrollableScrollPhysics(), // Disable scrolling
-                      children: _controller.localisations.map((localisation) {
-                        final filteredLockers = _controller.lockers
-                            .where((locker) =>
-                                locker.localisation.name == localisation.name)
-                            .toList();
-                        return ListView(
-                          children: <Widget>[
-                            Form(
-                              key: _controller.formKey,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                    child: _tabController == null
+                        ? Container()
+                        : TabBarView(
+                            controller: _tabController,
+                            physics:
+                                const NeverScrollableScrollPhysics(), // Disable scrolling
+                            children: _controller.localisations.map((localisation) {
+                              final filteredLockers = _controller.lockers
+                                  .where((locker) =>
+                                      locker.localisation.name == localisation.name)
+                                  .toList();
+                              return ListView(
                                 children: <Widget>[
-                                  Wrap(
-                                    spacing: 8.0, // Espacement horizontal
-                                    runSpacing: 8.0, // Espacement vertical
-                                    children: filteredLockers.map((locker) {
-                                      final isAvailable =
-                                          locker.status == 'available';
-                                      final isSelected =
-                                          _controller.selectedLockerId ==
-                                              locker.id;
+                                  Form(
+                                    key: _controller.formKey,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Wrap(
+                                          spacing: 8.0, // Espacement horizontal
+                                          runSpacing: 8.0, // Espacement vertical
+                                          children: filteredLockers.map((locker) {
+                                            final isAvailable =
+                                                locker.status == 'available';
+                                            final isSelected =
+                                                _controller.selectedLockerId ==
+                                                    locker.id;
 
-                                      return GestureDetector(
-                                        onTap: isAvailable
-                                            ? () {
-                                                setState(() {
-                                                  _controller.selectedLockerId =
-                                                      locker.id;
-                                                });
-                                              }
-                                            : null,
-                                        child: Container(
-                                          width: 48.0,
-                                          height: 48.0,
-                                          decoration: BoxDecoration(
-                                            color: isAvailable
-                                                ? Colors.green
-                                                : Colors.grey,
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            border: Border.all(
-                                              color: isSelected
-                                                  ? Colors.red
-                                                  : Colors.black,
-                                              width: 2.0,
-                                            ),
+                                            return GestureDetector(
+                                              onTap: isAvailable
+                                                  ? () {
+                                                      setState(() {
+                                                        _controller.selectedLockerId =
+                                                            locker.id;
+                                                      });
+                                                    }
+                                                  : null,
+                                              child: Container(
+                                                width: 48.0,
+                                                height: 48.0,
+                                                decoration: BoxDecoration(
+                                                  color: isAvailable
+                                                      ? Colors.green
+                                                      : Colors.grey,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8.0),
+                                                  border: Border.all(
+                                                    color: isSelected
+                                                        ? Colors.red
+                                                        : Colors.black,
+                                                    width: 2.0,
+                                                  ),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    '${locker.number}',
+                                                    style: const TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        const Text(
+                                          'Choisir les utilisateurs',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        TextField(
+                                          decoration: const InputDecoration(
+                                            labelText: 'Rechercher un utilisateur',
+                                            border: OutlineInputBorder(),
                                           ),
-                                          child: Center(
-                                            child: Text(
-                                              '${locker.number}',
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
+                                          onChanged: (query) {
+                                            setState(() {
+                                              _controller.updateSearchQuery(query);
+                                            });
+                                          },
+                                        ),
+                                        const SizedBox(height: 10),
+                                        SizedBox(
+                                          height: 200,
+                                          child: ListView(
+                                            children:
+                                                _controller.filteredUsers.map((user) {
+                                              final isSelected = _controller
+                                                  .selectedUsers
+                                                  .contains(user);
+                                              return CheckboxListTile(
+                                                key: Key(user.id), // Add a key to identify the user
+                                                title: Text(
+                                                    '${user.firstname} ${user.lastname} (${user.email})'),
+                                                value: isSelected,
+                                                onChanged: _controller.selectedUsers
+                                                                .length <
+                                                            4 ||
+                                                        isSelected
+                                                    ? (value) async {
+                                                        setState(() {
+                                                          _controller.onUserSelected(
+                                                              user, value!);
+                                                        });
+                                                      }
+                                                    : null,
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Row(
+                                          children: [
+                                            Checkbox(
+                                              value: _controller.termsAccepted,
+                                              onChanged: (bool? value) {
+                                                setState(() {
+                                                  _controller.termsAccepted = value!;
+                                                });
+                                              },
+                                            ),
+                                            Flexible(
+                                              child: GestureDetector(
+                                                onTap: () =>
+                                                    _showTermsDialog(context),
+                                                child: const Text(
+                                                  'J\'accepte les termes et les conditions d\'utilisation',
+                                                  style: TextStyle(
+                                                    decoration: TextDecoration
+                                                        .underline, // Souligner le texte
+                                                    color:
+                                                        Colors.blue, // Couleur du texte
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  const Text(
-                                    'Choisir les utilisateurs',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  TextField(
-                                    decoration: const InputDecoration(
-                                      labelText: 'Rechercher un utilisateur',
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    onChanged: (query) {
-                                      setState(() {
-                                        _controller.updateSearchQuery(query);
-                                      });
-                                    },
-                                  ),
-                                  const SizedBox(height: 10),
-                                  SizedBox(
-                                    height: 200,
-                                    child: ListView(
-                                      children:
-                                          _controller.filteredUsers.map((user) {
-                                        final isSelected = _controller
-                                            .selectedUsers
-                                            .contains(user);
-                                        return CheckboxListTile(
-                                          key: Key(user.id), // Add a key to identify the user
-                                          title: Text(
-                                              '${user.firstname} ${user.lastname} (${user.email})'),
-                                          value: isSelected,
-                                          onChanged: _controller.selectedUsers
-                                                          .length <
-                                                      4 ||
-                                                  isSelected
-                                              ? (value) async {
-                                                  setState(() {
-                                                    _controller.onUserSelected(
-                                                        user, value!);
-                                                  });
+                                        const SizedBox(height: 20),
+                                        ElevatedButton(
+                                          onPressed: _controller.termsAccepted
+                                              ? () async {
+                                                  final result = await _controller
+                                                      .submitForm(context);
+                                                  if (result) {
+                                                    await _initializeControllers();
+                                                  }
                                                 }
                                               : null,
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Row(
-                                    children: [
-                                      Checkbox(
-                                        value: _controller.termsAccepted,
-                                        onChanged: (bool? value) {
-                                          setState(() {
-                                            _controller.termsAccepted = value!;
-                                          });
-                                        },
-                                      ),
-                                      Flexible(
-                                        child: GestureDetector(
-                                          onTap: () =>
-                                              _showTermsDialog(context),
-                                          child: const Text(
-                                            'J\'accepte les termes et les conditions d\'utilisation',
-                                            style: TextStyle(
-                                              decoration: TextDecoration
-                                                  .underline, // Souligner le texte
-                                              color:
-                                                  Colors.blue, // Couleur du texte
-                                            ),
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.white,
+                                            backgroundColor:
+                                                Colors.green, // Couleur du bouton
                                           ),
+                                          child: const Text('Réserver'),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 20),
-                                  ElevatedButton(
-                                    onPressed: _controller.termsAccepted
-                                        ? () async {
-                                            final result = await _controller
-                                                .submitForm(context);
-                                            if (result) {
-                                              await _initializeControllers();
-                                            }
-                                          }
-                                        : null,
-                                    style: ElevatedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      backgroundColor:
-                                          Colors.green, // Couleur du bouton
+                                      ],
                                     ),
-                                    child: const Text('Réserver'),
                                   ),
                                 ],
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
-                    ),
+                              );
+                            }).toList(),
+                          ),
                   ),
                 ],
               ),

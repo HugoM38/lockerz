@@ -281,21 +281,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
-                                  GridView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 10,
-                                      crossAxisSpacing: 8.0,
-                                      mainAxisSpacing: 8.0,
-                                      childAspectRatio: 1.0,
-                                    ),
-                                    itemCount: filteredLockers.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      final locker = filteredLockers[index];
+                                  Wrap(
+                                    spacing: 8.0, // Espacement horizontal
+                                    runSpacing: 8.0, // Espacement vertical
+                                    children: filteredLockers.map((locker) {
                                       final isAvailable =
                                           locker.status == 'available';
                                       final isSelected =
@@ -312,6 +301,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                               }
                                             : null,
                                         child: Container(
+                                          width: 48.0,
+                                          height: 48.0,
                                           decoration: BoxDecoration(
                                             color: isAvailable
                                                 ? Colors.green
@@ -337,7 +328,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           ),
                                         ),
                                       );
-                                    },
+                                    }).toList(),
                                   ),
                                   const SizedBox(height: 20),
                                   const Text(
@@ -397,15 +388,18 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           });
                                         },
                                       ),
-                                      GestureDetector(
-                                        onTap: () => _showTermsDialog(context),
-                                        child: const Text(
-                                          'J\'accepte les termes et les conditions d\'utilisation',
-                                          style: TextStyle(
-                                            decoration: TextDecoration
-                                                .underline, // Souligner le texte
-                                            color:
-                                                Colors.blue, // Couleur du texte
+                                      Flexible(
+                                        child: GestureDetector(
+                                          onTap: () =>
+                                              _showTermsDialog(context),
+                                          child: const Text(
+                                            'J\'accepte les termes et les conditions d\'utilisation',
+                                            style: TextStyle(
+                                              decoration: TextDecoration
+                                                  .underline, // Souligner le texte
+                                              color:
+                                                  Colors.blue, // Couleur du texte
+                                            ),
                                           ),
                                         ),
                                       ),

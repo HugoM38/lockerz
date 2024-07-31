@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/user_model.dart';
@@ -24,7 +23,6 @@ class UserService {
       );
 
       if (response.statusCode != 201) {
-        debugPrint(response.body);
         return false;
       }
       return true;
@@ -36,7 +34,6 @@ class UserService {
   Future<bool> editUserPassword(String oldPassword, String newPassword) async {
     Uri url = Uri.parse("$baseUrl/editPassword");
     try {
-      debugPrint(await SharedPrefs.getAuthToken());
       var response = await http.patch(
         url,
         headers: <String, String>{
@@ -50,7 +47,6 @@ class UserService {
       );
 
       if (response.statusCode != 201) {
-        debugPrint(response.body);
         return false;
       }
       return true;
@@ -69,9 +65,7 @@ class UserService {
           'Authorization': 'Bearer ${ await SharedPrefs.getAuthToken()}'
         },
       );
-      debugPrint(response.body);
       if (response.statusCode != 204) {
-        debugPrint(response.body);
         return false;
       }
       return true;
@@ -90,9 +84,7 @@ class UserService {
           'Authorization': 'Bearer ${ await SharedPrefs.getAuthToken()}'
         },
       );
-      if (response.statusCode != 200) {
-        debugPrint(response.body);
-      }
+
       List<dynamic> body = jsonDecode(response.body);
       List<User> users = body.map((dynamic item) => User.fromJson(item)).toList();
       return users;
@@ -111,9 +103,7 @@ class UserService {
           'Authorization': 'Bearer ${ await SharedPrefs.getAuthToken()}'
         },
       );
-      if (response.statusCode != 200) {
-        debugPrint(response.body);
-      }
+
       dynamic body = jsonDecode(response.body);
       User user = User.fromJson(body);
       return user;

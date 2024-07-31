@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:lockerz/models/locker_model.dart';
 import '../utils/shared_prefs.dart';
@@ -16,9 +15,6 @@ class LockerService {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ${await SharedPrefs.getAuthToken()}'
           });
-      if (response.statusCode != 200) {
-        debugPrint(response.body);
-      }
       List<dynamic> body = jsonDecode(response.body);
       List<Locker> lockers = body.map((dynamic item) => Locker.fromJson(item)).toList();
       return lockers;
@@ -42,7 +38,6 @@ class LockerService {
         }),
       );
       if (response.statusCode != 200) {
-        debugPrint(response.body);
         return false;
       }
       return true;
@@ -63,7 +58,6 @@ class LockerService {
         body: jsonEncode(lockerData),
       );
       if (response.statusCode != 201) {
-        debugPrint(response.body);
         return false;
       }
       return true;
@@ -87,7 +81,6 @@ class LockerService {
         }),
       );
       if (response.statusCode != 200) {
-        debugPrint(response.body);
         return false;
       }
       return true;

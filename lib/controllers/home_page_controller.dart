@@ -67,11 +67,13 @@ class HomePageController {
         return false;
       }
       if (!termsAccepted) {
-        showCustomSnackBar(context, 'Veuillez accepter les termes d\'utilisation.');
+        showCustomSnackBar(
+            context, 'Veuillez accepter les termes d\'utilisation.');
         return false;
       }
       if (!isAnyUserSelected) {
-        showCustomSnackBar(context, 'Veuillez sélectionner au moins un utilisateur.');
+        showCustomSnackBar(
+            context, 'Veuillez sélectionner au moins un utilisateur.');
         return false;
       }
 
@@ -81,7 +83,9 @@ class HomePageController {
       );
 
       if (context.mounted) {
-        showCustomSnackBar(context, result
+        showCustomSnackBar(
+            context,
+            result
                 ? 'Formulaire soumis avec succès!'
                 : 'Erreur lors de la création de la réservation');
       }
@@ -97,9 +101,13 @@ class HomePageController {
     if (currentReservation != null) {
       final result = await ReservationService()
           .terminateReservation(currentReservation!.id);
-      showCustomSnackBar(context, result
-              ? 'Réservation terminée avec succès!'
-              : 'Erreur de lors de la terminaison de votre réservation');
+      if (context.mounted) {
+        showCustomSnackBar(
+            context,
+            result
+                ? 'Réservation terminée avec succès!'
+                : 'Erreur de lors de la terminaison de votre réservation');
+      }
       if (result) {
         resetForm();
       }
@@ -113,7 +121,9 @@ class HomePageController {
       final result = await ReservationService()
           .terminateReservation(currentReservation!.id);
       if (context.mounted) {
-        showCustomSnackBar(context, result
+        showCustomSnackBar(
+            context,
+            result
                 ? 'Réservation annulée avec succès!'
                 : 'Erreur lors de l\'annulation de votre réservation');
       }
@@ -128,7 +138,9 @@ class HomePageController {
       final result =
           await ReservationService().leaveReservation(currentReservation!.id);
       if (context.mounted) {
-        showCustomSnackBar(context, result
+        showCustomSnackBar(
+            context,
+            result
                 ? 'Vous vous êtes retiré du casier avec succès!'
                 : 'Erreur de lors du votre retrait du casier');
       }

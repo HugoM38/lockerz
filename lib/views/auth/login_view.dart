@@ -58,7 +58,7 @@ class _LoginViewState extends State<LoginView> {
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 minHeight: MediaQuery.of(context).size.height -
-                    kToolbarHeight, // Adjust height to account for the AppBar
+                    kToolbarHeight,
               ),
               child: Center(
                 child: Padding(
@@ -300,7 +300,7 @@ class _LoginViewState extends State<LoginView> {
                     'Ce site utilise des cookies essentiels pour garantir son bon fonctionnement et améliorer votre expérience. Nous respectons votre vie privée et ne partageons aucune donnée personnelle.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 12, // Taille de texte plus petite
+                      fontSize: 12,
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),

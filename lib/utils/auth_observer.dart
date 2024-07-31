@@ -15,6 +15,5 @@ class AuthObserver extends NavigatorObserver {
 
   void _logNavigation(String? routeName) {
     if (routeName == null) return;
-    print('Navigated to $routeName');
   }
 }

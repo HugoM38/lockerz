@@ -39,7 +39,8 @@ class ForgotPasswordController {
     }
 
     if (!email.contains('@') || !email.endsWith("@myges.fr")) {
-      showCustomSnackBar(context, 'Veuillez saisir un email valide de l\'école finissant par "myges.fr"');
+      showCustomSnackBar(context,
+          'Veuillez saisir un email valide de l\'école finissant par "myges.fr"');
       return;
     }
 
@@ -47,12 +48,14 @@ class ForgotPasswordController {
     final response = await _userService.forgotPassword(email);
     isLoading.value = false;
 
-    if (response.statusCode == 200) {
-      isCodeSent.value = true;
-      startResendCooldown();
-      showCustomSnackBar(context, 'Code de vérification envoyé.');
-    } else {
-      showCustomSnackBar(context, 'Erreur lors de l\'envoi du code.');
+    if (context.mounted) {
+      if (response.statusCode == 200) {
+        isCodeSent.value = true;
+        startResendCooldown();
+        showCustomSnackBar(context, 'Code de vérification envoyé.');
+      } else {
+        showCustomSnackBar(context, 'Erreur lors de l\'envoi du code.');
+      }
     }
   }
 
@@ -67,7 +70,8 @@ class ForgotPasswordController {
     }
 
     if (RegExp(r'^(?=.*[A-Z])(?=.*\d).{8,}$').hasMatch(newPassword) == false) {
-      showCustomSnackBar(context, 'Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre');
+      showCustomSnackBar(context,
+          'Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre');
       return;
     }
 
@@ -83,9 +87,9 @@ class ForgotPasswordController {
       await SharedPrefs.saveAuthToken(token);
       await SharedPrefs.saveUserInformation(jsonEncode(user));
 
-      showCustomSnackBar(context, 'Mot de passe réinitialisé avec succès.');
-
       if (context.mounted) {
+        showCustomSnackBar(context, 'Mot de passe réinitialisé avec succès.');
+
         if (user['role'] == 'admin') {
           Navigator.of(context).pushReplacementNamed('/admin-home');
         } else {
@@ -93,7 +97,10 @@ class ForgotPasswordController {
         }
       }
     } else {
-      showCustomSnackBar(context, 'Erreur lors de la réinitialisation du mot de passe.');
+      if (context.mounted) {
+        showCustomSnackBar(
+            context, 'Erreur lors de la réinitialisation du mot de passe.');
+      }
     }
   }
 

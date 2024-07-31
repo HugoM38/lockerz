@@ -70,7 +70,7 @@ class AdminHomePageState extends State<AdminHomePage>
   }
 
   void _showAddLockerPopup(BuildContext context, String localisationId) {
-    TextEditingController _numberController = TextEditingController();
+    TextEditingController numberController = TextEditingController();
     double popupWidth = MediaQuery.of(context).size.width > 600
         ? MediaQuery.of(context).size.width * 0.5
         : MediaQuery.of(context).size.width * 0.9;
@@ -110,7 +110,7 @@ class AdminHomePageState extends State<AdminHomePage>
                       ),
                       const SizedBox(height: 16),
                       TextField(
-                        controller: _numberController,
+                        controller: numberController,
                         decoration: const InputDecoration(
                           labelText: 'Numéro du casier',
                           border: OutlineInputBorder(),
@@ -122,7 +122,7 @@ class AdminHomePageState extends State<AdminHomePage>
                         children: [
                           ElevatedButton(
                             onPressed: () {
-                              _createLocker(context, _numberController.text,
+                              _createLocker(context, numberController.text,
                                   localisationId);
                             },
                             style: ElevatedButton.styleFrom(
@@ -164,19 +164,18 @@ class AdminHomePageState extends State<AdminHomePage>
       'localisation': localisationId,
     };
 
-    print(
-        'Données envoyées : $lockerData'); // Afficher les données dans la console
-
     final success = await _lockerService.createLocker(lockerData);
 
-    if (success) {
-      showCustomSnackBar(context, 'Casier ajouté avec succès');
-      if (mounted) {
-        Navigator.of(context).pop();
-        await _initializeControllers(); // Rafraîchir les données après ajout
+    if (context.mounted) {
+      if (success) {
+        showCustomSnackBar(context, 'Casier ajouté avec succès');
+        if (mounted) {
+          Navigator.of(context).pop();
+          await _initializeControllers();
+        }
+      } else {
+        showCustomSnackBar(context, 'Erreur lors de l\'ajout du casier');
       }
-    } else {
-      showCustomSnackBar(context, 'Erreur lors de l\'ajout du casier');
     }
   }
 
@@ -243,9 +242,9 @@ class AdminHomePageState extends State<AdminHomePage>
                                           CrossAxisAlignment.center,
                                       children: <Widget>[
                                         Wrap(
-                                          spacing: 8.0, // Espacement horizontal
+                                          spacing: 8.0,
                                           runSpacing:
-                                              8.0, // Espacement vertical
+                                              8.0,
                                           children: [
                                             ...filteredLockers.map((locker) {
                                               final isAvailable =
@@ -283,7 +282,7 @@ class AdminHomePageState extends State<AdminHomePage>
                                                   ),
                                                 ),
                                               );
-                                            }).toList(),
+                                            }),
                                             GestureDetector(
                                               onTap: () {
                                                 _showAddLockerPopup(
@@ -334,186 +333,203 @@ class AdminHomePageState extends State<AdminHomePage>
       BuildContext context, String lockerId, bool isAvailable) async {
     List<Reservation> history =
         await ReservationService().getLockerHistory(lockerId);
-    double popupWidth = MediaQuery.of(context).size.width > 600
-        ? MediaQuery.of(context).size.width * 0.6
-        : MediaQuery.of(context).size.width * 0.9;
+    if (context.mounted) {
+      double popupWidth = MediaQuery.of(context).size.width > 600
+          ? MediaQuery.of(context).size.width * 0.6
+          : MediaQuery.of(context).size.width * 0.9;
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border:
-                      Border.all(color: Theme.of(context).colorScheme.primary),
-                  borderRadius: BorderRadius.circular(15),
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                ),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: popupWidth,
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.primary),
+                    borderRadius: BorderRadius.circular(15),
+                    color:
+                        Theme.of(context).colorScheme.primary.withOpacity(0.1),
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Center(
-                        child: Text(
-                          'Réservations du casier',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: popupWidth,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Center(
+                          child: Text(
+                            'Réservations du casier',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(context).size.height * 0.6,
-                          maxWidth: MediaQuery.of(context).size.width * 0.8,
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.height * 0.6,
+                            maxWidth: MediaQuery.of(context).size.width * 0.8,
+                          ),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: history.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    final reservation = history[index];
+                                    return Container(
+                                      margin: const EdgeInsets.only(bottom: 8),
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary),
+                                        borderRadius: BorderRadius.circular(15),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withOpacity(0.1),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                '${reservation.owner.firstname} ${reservation.owner.lastname}',
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(_translateStatus(
+                                                  reservation.status)),
+                                            ],
+                                          ),
+                                          Text(reservation.owner.email),
+                                          ExpansionTile(
+                                            title: const SizedBox.shrink(),
+                                            children: reservation.members
+                                                .map((member) {
+                                              return ListTile(
+                                                title: Text(
+                                                    '${member.firstname} ${member.lastname} (${member.email})'),
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: history.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  final reservation = history[index];
-                                  return Container(
-                                    margin: const EdgeInsets.only(bottom: 8),
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary),
-                                      borderRadius: BorderRadius.circular(15),
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary
-                                          .withOpacity(0.1),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              '${reservation.owner.firstname} ${reservation.owner.lastname}',
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(_translateStatus(
-                                                reservation.status)),
-                                          ],
-                                        ),
-                                        Text(reservation.owner.email),
-                                        ExpansionTile(
-                                          title: const SizedBox.shrink(),
-                                          children:
-                                              reservation.members.map((member) {
-                                            return ListTile(
-                                              title: Text(
-                                                  '${member.firstname} ${member.lastname} (${member.email})'),
-                                            );
-                                          }).toList(),
-                                        ),
-                                      ],
-                                    ),
-                                  );
+                        if (!isAvailable &&
+                            history.isNotEmpty &&
+                            (history.last.status == 'accepted' ||
+                                history.last.status == 'pending'))
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  await _controller.terminateReservation(
+                                      context, history.last.id);
+                                  if (mounted) {
+                                    if (context.mounted) {
+                                      Navigator.of(context).pop();
+                                      await _initializeControllers();
+                                    }
+                                  }
                                 },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text('Annuler la réservation'),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      if (!isAvailable && history.isNotEmpty && (history.last.status == 'accepted' || history.last.status == 'pending') )
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 16.0),
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                await _controller.terminateReservation(
-                                    context, history.last.id);
-                                if (mounted) {
-                                  Navigator.of(context).pop();
-                                  await _initializeControllers();
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
-                              ),
-                              child: const Text('Annuler la réservation'),
                             ),
                           ),
-                        ),
-                      if (!isAvailable && (history.isEmpty || (history.last.status == 'refused' || history.last.status == 'terminated')))
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 16.0),
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                await _controller.changeLockerStatus(
-                                    context, lockerId, 'available');
-                                if (mounted) {
-                                  Navigator.of(context).pop();
-                                  await _initializeControllers();
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                foregroundColor: Colors.white,
+                        if (!isAvailable &&
+                            (history.isEmpty ||
+                                (history.last.status == 'refused' ||
+                                    history.last.status == 'terminated')))
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  await _controller.changeLockerStatus(
+                                      context, lockerId, 'available');
+                                  if (mounted) {
+                                    if (context.mounted) {
+                                      Navigator.of(context).pop();
+                                      await _initializeControllers();
+                                    }
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text('Déverouiller le casier'),
                               ),
-                              child: const Text('Déverouiller le casier'),
                             ),
                           ),
-                        ),
-                      if (isAvailable)
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 16.0),
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                await _controller.changeLockerStatus(
-                                    context, lockerId, 'unavailable');
-                                if (mounted) {
-                                  Navigator.of(context).pop();
-                                  await _initializeControllers();
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
+                        if (isAvailable)
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  await _controller.changeLockerStatus(
+                                      context, lockerId, 'unavailable');
+                                  if (mounted) {
+                                    if (context.mounted) {
+                                      Navigator.of(context).pop();
+                                      await _initializeControllers();
+                                    }
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text('Verouiller le casier'),
                               ),
-                              child: const Text('Verouiller le casier'),
                             ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
+    }
   }
 
   String _translateStatus(String status) {

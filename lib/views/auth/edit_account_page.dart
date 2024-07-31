@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:lockerz/views/auth/login_view.dart';
 import 'package:lockerz/views/shared/navbar.dart';
 import 'package:lockerz/utils/shared_prefs.dart';
 import '../../controllers/edit_account_controller.dart';
@@ -56,7 +55,7 @@ class EditAccountPageState extends State<EditAccountPage> {
       body: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height - kToolbarHeight, // Adjust height to account for the AppBar
+            minHeight: MediaQuery.of(context).size.height - kToolbarHeight,
           ),
           child: Center(
             child: Padding(

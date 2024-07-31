@@ -77,21 +77,21 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     return SingleChildScrollView(
       child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: 500, // Largeur maximale de la carte
+        constraints: const BoxConstraints(
+          maxWidth: 500,
         ),
         child: Container(
-          padding: const EdgeInsets.all(16), // Espaces internes
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             border: Border.all(color: Theme.of(context).colorScheme.primary),
-            borderRadius: BorderRadius.circular(15), // Rayon des coins ajusté
+            borderRadius: BorderRadius.circular(15),
             color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(15),
             child: BackdropFilter(
               filter: ImageFilter.blur(
-                  sigmaY: 4, sigmaX: 4), // Intensité du flou ajustée
+                  sigmaY: 4, sigmaX: 4),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -105,12 +105,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             .textTheme
                             .headlineMedium!
                             .copyWith(
-                          fontSize: 22, // Taille du texte
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface,
                           shadows: [
                             const Shadow(
-                              blurRadius: 8.0, // Intensité de l'ombre
+                              blurRadius: 8.0,
                               color: Colors.black,
                               offset: Offset(1.0, 1.0),
                             ),
@@ -118,7 +118,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16), // Espaces entre les éléments
+                    const SizedBox(height: 16),
                     _buildCard('Casier', Icons.lock,
                         '${_currentReservation!.locker.number}'),
                     _buildCard('Localisation', Icons.location_on,
@@ -132,14 +132,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         leading: Icon(Icons.group,
                             color: Theme.of(context).colorScheme.primary),
                         title: const Text('Membres',
-                            style: TextStyle(fontSize: 16)), // Taille du texte
+                            style: TextStyle(fontSize: 16)),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: _currentReservation!.members.map((member) {
                             return Text(
                                 '${member.firstname} ${member.lastname} (${member.email})',
                                 style: const TextStyle(
-                                    fontSize: 14)); // Taille du texte
+                                    fontSize: 14));
                           }).toList(),
                         ),
                       ),
@@ -161,7 +161,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.white,
                                 backgroundColor:
-                                    Colors.red, // Couleur du bouton
+                                    Colors.red,
                               ),
                               child: const Text('Se retirer du casier'),
                             ),
@@ -204,9 +204,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: ListTile(
         leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
         title: Text(title,
-            style: const TextStyle(fontSize: 16)), // Taille du texte
+            style: const TextStyle(fontSize: 16)),
         subtitle: Text(subtitle,
-            style: const TextStyle(fontSize: 14)), // Taille du texte
+            style: const TextStyle(fontSize: 14)),
       ),
     );
   }
@@ -225,22 +225,22 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget _buildReservationForm() {
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxWidth: 500, // Largeur maximale de la carte
+        maxWidth: 500,
         maxHeight: MediaQuery.of(context).size.height *
-            0.9, // Hauteur maximale ajustée
+            0.9,
       ),
       child: Container(
-        padding: const EdgeInsets.all(16), // Espaces internes
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           border: Border.all(color: Theme.of(context).colorScheme.primary),
-          borderRadius: BorderRadius.circular(15), // Rayon des coins ajusté
+          borderRadius: BorderRadius.circular(15),
           color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
           child: BackdropFilter(
             filter: ImageFilter.blur(
-                sigmaY: 4, sigmaX: 4), // Intensité du flou ajustée
+                sigmaY: 4, sigmaX: 4),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -261,7 +261,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               text: localisation.name,
                               icon: localisation.accessibility
                                   ? const Icon(Icons
-                                      .wheelchair_pickup) // Icône de handicap
+                                      .wheelchair_pickup)
                                   : const Icon(Icons.accessibility),
                             );
                           }).toList(),
@@ -273,7 +273,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         : TabBarView(
                             controller: _tabController,
                             physics:
-                                const NeverScrollableScrollPhysics(), // Disable scrolling
+                                const NeverScrollableScrollPhysics(),
                             children:
                                 _controller.localisations.map((localisation) {
                               final filteredLockers = _controller.lockers
@@ -290,9 +290,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           CrossAxisAlignment.center,
                                       children: <Widget>[
                                         Wrap(
-                                          spacing: 8.0, // Espacement horizontal
+                                          spacing: 8.0,
                                           runSpacing:
-                                              8.0, // Espacement vertical
+                                              8.0,
                                           children:
                                               filteredLockers.map((locker) {
                                             final isAvailable =
@@ -375,7 +375,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                   .contains(user);
                                               return CheckboxListTile(
                                                 key: Key(user
-                                                    .id), // Add a key to identify the user
+                                                    .id),
                                                 title: Text(
                                                     '${user.firstname} ${user.lastname} (${user.email})'),
                                                 value: isSelected,
@@ -416,9 +416,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                   'J\'accepte les termes et les conditions d\'utilisation',
                                                   style: TextStyle(
                                                     decoration: TextDecoration
-                                                        .underline, // Souligner le texte
+                                                        .underline,
                                                     color: Colors
-                                                        .blue, // Couleur du texte
+                                                        .blue,
                                                   ),
                                                 ),
                                               ),
@@ -440,7 +440,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           style: ElevatedButton.styleFrom(
                                             foregroundColor: Colors.white,
                                             backgroundColor: Colors
-                                                .green, // Couleur du bouton
+                                                .green,
                                           ),
                                           child: const Text('Réserver'),
                                         ),

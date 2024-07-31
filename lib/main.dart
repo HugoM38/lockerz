@@ -55,7 +55,7 @@ class Lockerz extends StatelessWidget {
                 }
 
                 if (!snapshot.hasData || !snapshot.data!) {
-                  return const LoginView(); // Redirect to login if not authenticated
+                  return const LoginView();
                 }
 
                 switch (settings.name) {
@@ -74,7 +74,7 @@ class Lockerz extends StatelessWidget {
                   case '/admin':
                     return const AdministrationPage();
                   default:
-                    return const LoginView(); // Fallback to login
+                    return const LoginView();
                 }
               },
             );

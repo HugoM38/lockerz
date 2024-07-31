@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:lockerz/models/localisation_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -18,9 +17,6 @@ class LocalisationService {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ${await SharedPrefs.getAuthToken()}'
           });
-      if (response.statusCode != 200) {
-        debugPrint(response.body);
-      }
       List<dynamic> body = jsonDecode(response.body);
       List<Localisation> lockers = body.map((dynamic item) => Localisation.fromJson(item))
           .toList();

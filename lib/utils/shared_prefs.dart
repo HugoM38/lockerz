@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:lockerz/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class SharedPrefs {
   static const String _authTokenKey = 'authToken';

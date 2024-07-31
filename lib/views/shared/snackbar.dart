@@ -9,11 +9,11 @@ void showCustomSnackBar(BuildContext context, String message) {
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(color: Colors.white), // Texte en blanc
+              style: const TextStyle(color: Colors.white),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.white), // Icône de fermeture en blanc
+            icon: const Icon(Icons.close, color: Colors.white),
             onPressed: () {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
             },
@@ -21,7 +21,7 @@ void showCustomSnackBar(BuildContext context, String message) {
         ],
       ),
       behavior: SnackBarBehavior.floating,
-      backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.8), // Fond plus clair
+      backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
       duration: const Duration(seconds: 3),
     ),
   );

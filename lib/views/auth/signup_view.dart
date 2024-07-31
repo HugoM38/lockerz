@@ -250,7 +250,7 @@ class _SignupViewState extends State<SignupView> {
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 16),
-                      Expanded(
+                      const Expanded(
                         child: SingleChildScrollView(
                           child: Text(
                             'Bienvenue sur l\'application de réservation de casiers de notre école. En utilisant cette application, vous acceptez les présentes Conditions Générales d\'Utilisation (CGU). Veuillez les lire attentivement avant de procéder à l\'utilisation de l\'application.\n\n'

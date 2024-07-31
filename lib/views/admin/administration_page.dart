@@ -42,7 +42,7 @@ class AdministrationPageState extends State<AdministrationPage> {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(
-              maxWidth: 600, // Limite la largeur de la liste
+              maxWidth: 600,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,9 +50,9 @@ class AdministrationPageState extends State<AdministrationPage> {
                 Text(
                   'Liste des réservations en attente',
                   style: TextStyle(
-                    fontSize: 24, // Taille de police personnalisée
-                    fontWeight: FontWeight.bold, // Poids de police personnalisée
-                    color: Theme.of(context).colorScheme.primary, // Couleur personnalisée
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -70,7 +70,7 @@ class AdministrationPageState extends State<AdministrationPage> {
                           itemCount: reservations.length,
                           itemBuilder: (context, index) {
                             return AdministrationItem(
-                              key: ValueKey(reservations[index].id), // Assurez-vous d'utiliser une clé unique
+                              key: ValueKey(reservations[index].id),
                               reservation: reservations[index],
                               onRemove: () => _removeReservation(reservations[index].id),
                             );

@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lockerz/views/shared/navbar.dart';
 import '../../controllers/signup_controller.dart';
-import 'login_view.dart';
 
 class SignupView extends StatefulWidget {
   const SignupView({super.key});

@@ -15,7 +15,6 @@ class AuthService {
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
       final token = responseData['token'];
-
       final user = responseData['user'];
 
       await SharedPrefs.saveAuthToken(token);
@@ -24,8 +23,7 @@ class AuthService {
     return response;
   }
 
-  Future<http.Response> register(
-      String firstname, String lastname, String email, String password) async {
+  Future<http.Response> register(String firstname, String lastname, String email, String password) async {
     final response = await http.post(
       Uri.parse('$baseUrl/signup'),
       headers: {'Content-Type': 'application/json'},
@@ -65,7 +63,6 @@ class AuthService {
     );
 
     if (response.statusCode == 200) {
-
       final responseData = jsonDecode(response.body);
       final token = responseData['token'];
       await SharedPrefs.saveAuthToken(token);

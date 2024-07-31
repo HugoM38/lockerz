@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lockerz/views/shared/navbar.dart';
 import '../../controllers/login_controller.dart';
-import 'signup_view.dart';
+import 'forgot_password_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginView extends StatefulWidget {
@@ -57,14 +57,18 @@ class _LoginViewState extends State<LoginView> {
           SingleChildScrollView(
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height - kToolbarHeight, // Adjust height to account for the AppBar
+                minHeight: MediaQuery.of(context).size.height -
+                    kToolbarHeight, // Adjust height to account for the AppBar
               ),
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: LayoutBuilder(
-                    builder: (BuildContext context, BoxConstraints constraints) {
-                      double maxWidth = constraints.maxWidth < 400 ? constraints.maxWidth : 400;
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      double maxWidth = constraints.maxWidth < 400
+                          ? constraints.maxWidth
+                          : 400;
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -115,17 +119,17 @@ class _LoginViewState extends State<LoginView> {
                   child: Text(
                     "Connexion",
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onSurface,
-                          shadows: [
-                            const Shadow(
-                              blurRadius: 10.0,
-                              color: Colors.black,
-                              offset: Offset(2.0, 2.0),
-                            ),
-                          ],
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                      shadows: [
+                        const Shadow(
+                          blurRadius: 10.0,
+                          color: Colors.black,
+                          offset: Offset(2.0, 2.0),
                         ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -136,6 +140,8 @@ class _LoginViewState extends State<LoginView> {
                 buildPasswordField(context),
                 const SizedBox(height: 20),
                 buildLoginButton(context),
+                const SizedBox(height: 10),
+                buildForgotPasswordButton(context),
                 const SizedBox(height: 20),
                 buildSignupButton(context),
               ],
@@ -210,27 +216,53 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
+  Widget buildForgotPasswordButton(BuildContext context) {
+    return Center(
+      child: TextButton(
+        onPressed: () {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const ForgotPasswordView()));
+        },
+        child: Text(
+          "Mot de passe oublié ?",
+          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+            shadows: [
+              const Shadow(
+                blurRadius: 10.0,
+                color: Colors.black,
+                offset: Offset(2.0, 2.0),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget buildSignupButton(BuildContext context) {
     return Center(
       child: TextButton(
         onPressed: () {
           Navigator.pushReplacementNamed(
             context,
-            "/signup"
+            "/signup",
           );
         },
         child: Text(
           "Pas de compte ? Inscrivez-vous !",
           style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-                shadows: [
-                  const Shadow(
-                    blurRadius: 10.0,
-                    color: Colors.black,
-                    offset: Offset(2.0, 2.0),
-                  ),
-                ],
+            color: Theme.of(context).colorScheme.onSurface,
+            shadows: [
+              const Shadow(
+                blurRadius: 10.0,
+                color: Colors.black,
+                offset: Offset(2.0, 2.0),
               ),
+            ],
+          ),
         ),
       ),
     );
@@ -268,7 +300,7 @@ class _LoginViewState extends State<LoginView> {
                     'Ce site utilise des cookies essentiels pour garantir son bon fonctionnement et améliorer votre expérience. Nous respectons votre vie privée et ne partageons aucune donnée personnelle.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 12,  // Taille de texte plus petite
+                      fontSize: 12, // Taille de texte plus petite
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),

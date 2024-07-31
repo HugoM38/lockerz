@@ -121,4 +121,26 @@ class UserService {
       throw Exception(e.toString());
     }
   }
+
+  Future<http.Response> forgotPassword(String email) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/forgotPassword'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+    return response;
+  }
+
+  Future<http.Response> resetPassword(String email, String code, String newPassword) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/resetPassword'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'code': code,
+        'newPassword': newPassword,
+      }),
+    );
+    return response;
+  }
 }

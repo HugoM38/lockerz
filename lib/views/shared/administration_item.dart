@@ -88,7 +88,7 @@ class AdministrationItemState extends State<AdministrationItem> {
                       Expanded(
                         child: Text(
                           "${_administrationController.reservation.owner.firstname} ${_administrationController.reservation.owner.lastname} : Casier ${_administrationController.reservation.locker.number}",
-                          overflow: TextOverflow.ellipsis, // Gestion du débordement du texte
+                          overflow: TextOverflow.clip, // Gestion du débordement du texte
                         ),
                       ),
                       Row(
@@ -116,7 +116,7 @@ class AdministrationItemState extends State<AdministrationItem> {
                   _administrationController.reservation.members.isEmpty
                       ? "Aucun membre en plus du propriétaire."
                       : "Membres: ${_administrationController.reservation.members.map((member) => "${member.firstname} ${member.lastname}").join(', ')}",
-                  overflow: TextOverflow.ellipsis, // Gestion du débordement du texte
+                  overflow: TextOverflow.clip, // Gestion du débordement du texte
                 ),
               ),
               isExpanded: _isExpanded,

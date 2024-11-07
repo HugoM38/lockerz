@@ -22,7 +22,6 @@ class HomePageController {
   List<Localisation> localisations = [];
   User? currentUser;
   Reservation? currentReservation;
-  bool get isAnyUserSelected => selectedUsers.isNotEmpty;
 
   Future<void> initialize() async {
     currentUser = await SharedPrefs.getUser();
@@ -69,11 +68,6 @@ class HomePageController {
       if (!termsAccepted) {
         showCustomSnackBar(
             context, 'Veuillez accepter les termes d\'utilisation.');
-        return false;
-      }
-      if (!isAnyUserSelected) {
-        showCustomSnackBar(
-            context, 'Veuillez sélectionner au moins un utilisateur.');
         return false;
       }
 

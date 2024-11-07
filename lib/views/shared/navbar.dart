@@ -33,10 +33,11 @@ class NavBar extends StatelessWidget implements PreferredSizeWidget {
                 "/home",
               )
             },
-            child: const Text(
-              'Lockerz',
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
+            child: Image.asset('assets/images/eductive_logo.png',
+              width: 100,
+              height: 50,
+              fit: BoxFit.cover
+            )
           ),
           const Spacer(),
           FutureBuilder<bool>(

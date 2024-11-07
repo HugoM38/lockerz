@@ -225,7 +225,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget _buildReservationForm() {
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxWidth: 500,
+        maxWidth: 700,
         maxHeight: MediaQuery.of(context).size.height *
             0.9,
       ),
@@ -254,18 +254,25 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   _tabController == null
                       ? Container()
                       : TabBar(
-                          controller: _tabController,
-                          isScrollable: true,
-                          tabs: _controller.localisations.map((localisation) {
-                            return Tab(
-                              text: localisation.name,
-                              icon: localisation.accessibility
-                                  ? const Icon(Icons
-                                      .wheelchair_pickup)
+                    controller: _tabController,
+                    isScrollable: true,
+                    tabs: _controller.localisations.map((localisation) {
+                      return Tab(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 0), // Ajustez ici si besoin
+                          child: Row(
+                            children: [
+                              localisation.accessibility
+                                  ? const Icon(Icons.wheelchair_pickup)
                                   : const Icon(Icons.accessibility),
-                            );
-                          }).toList(),
+                              const SizedBox(width: 4), // Espace entre l'icône et le texte
+                              Text(localisation.name),
+                            ],
+                          ),
                         ),
+                      );
+                    }).toList(),
+                  ),
                   const SizedBox(height: 20),
                   Expanded(
                     child: _tabController == null
@@ -490,29 +497,49 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Règles pour le cadenas',
+                        '',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                       ),
                       const SizedBox(height: 16),
-                      const Text(
-                        "Cadenas à clés : ",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const Text(
-                          "Obligation de déposer un double de la clé à l'accueil.",
+                      const Expanded(
+                        child: SingleChildScrollView(
+                          child: Text(
+'''Conditions Générales d’Utilisation des casiers de EDUCTIVE Grenoble
+    
+Adresse : 6 Rue Irvoy, 38000 Grenoble
+
+En accédant et en utilisant les services de réservation de casiers mis à disposition par le campus EDUCTIVE Grenoble, l'utilisateur accepte sans réserve les présentes conditions générales d'utilisation. Ces conditions visent à assurer le bon usage des casiers, dans le respect des règles de sécurité et d’hygiène. Tout manquement à ces règles pourra entraîner des sanctions, y compris le retrait du casier réservé.
+
+1. Objet du service
+Les casiers mis à disposition par EDUCTIVE Grenoble sont destinés au stockage personnel des effets personnels des étudiants pendant la période d’une année scolaire. Le service de réservation est accessible à tous les étudiants inscrits dans les écoles du campus.
+
+2. Règles d’utilisation des casiers
+2.1 Interdiction de stockage de produits illégaux
+Les utilisateurs s'engagent à ne placer aucun objet illégal dans les casiers. Cette interdiction inclut, sans s’y limiter, les substances illicites, armes, ou tout objet dont la possession est interdite par la loi.
+
+2.2 Interdiction de stockage de denrées périssables
+Les casiers ne doivent pas être utilisés pour le stockage de denrées périssables susceptibles de se dégrader, générer des odeurs, ou présenter un risque sanitaire.
+
+2.3 Exonération de responsabilité en cas de vol
+EDUCTIVE Grenoble ne pourra être tenu pour responsable en cas de vol ou de détérioration du contenu des casiers. Les utilisateurs sont donc invités à ne pas stocker d’objets de valeur.
+
+2.4 Durée de réservation et libération du casier
+Les casiers sont réservés pour une durée maximale correspondant à une année scolaire. À l'issue de cette période, les utilisateurs doivent libérer le casier ou renouveler leur réservation pour l'année scolaire suivante. EDUCTIVE Grenoble se réserve le droit de récupérer tout casier non libéré sans notification préalable.
+
+2.5 Contrôles aléatoires
+Le campus se réserve le droit d’effectuer des contrôles inopinés du contenu des casiers afin de s’assurer du respect de ces conditions générales d'utilisation. Les utilisateurs acceptent que ces contrôles puissent être effectués sans préavis.
+
+3. Sanctions
+Tout manquement aux présentes conditions d'utilisation pourra entraîner des sanctions, telles que la résiliation de la réservation du casier. En cas de résiliation pour non-respect des règles, l’utilisateur perdra son droit d’utilisation du casier, sans possibilité de remboursement de la réservation, le cas échéant.
+
+En utilisant les casiers, l’utilisateur reconnaît avoir pris connaissance des présentes conditions générales d’utilisation et s’engage à les respecter intégralement.
+''',
                           style: TextStyle(fontSize: 14)),
+                        ),
+                      ),
                       const SizedBox(height: 8),
-                      const Text(
-                        "Cadenas à code : ",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const Text(
-                          "Le code doit être partagé avec les membres de l'équipe et l'accueil.",
-                          style: TextStyle(fontSize: 14)),
                       const SizedBox(height: 16),
                       Align(
                         alignment: Alignment.centerRight,

@@ -4,7 +4,7 @@ import 'package:lockerz/models/reservation_model.dart';
 import '../utils/shared_prefs.dart';
 
 class ReservationService {
-  var baseUrl = 'http://localhost:5001/api/reservation';
+  var baseUrl = 'http://localhost:81/api/reservation';
 
   Future<List<Reservation>> getReservation() async {
     Uri url = Uri.parse("$baseUrl/pendingReservation");

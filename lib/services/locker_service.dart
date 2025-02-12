@@ -4,7 +4,7 @@ import 'package:lockerz/models/locker_model.dart';
 import '../utils/shared_prefs.dart';
 
 class LockerService {
-  var baseUrl = 'http://localhost:5001/api/locker';
+  var baseUrl = 'http://localhost:81/api/locker';
 
   Future<List<Locker>> getLockers() async {
     Uri url = Uri.parse("$baseUrl/");
